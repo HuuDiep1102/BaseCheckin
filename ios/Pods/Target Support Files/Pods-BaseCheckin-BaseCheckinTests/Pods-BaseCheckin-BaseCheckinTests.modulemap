@@ -1,0 +1,6 @@
+module Pods_BaseCheckin_BaseCheckinTests {
+  umbrella header "Pods-BaseCheckin-BaseCheckinTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
