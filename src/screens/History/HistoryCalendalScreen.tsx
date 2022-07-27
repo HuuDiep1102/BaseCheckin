@@ -1,20 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import * as React from 'react';
-import {View, StyleSheet, Dimensions, StatusBar, Text} from 'react-native';
-import {TabView, SceneMap} from 'react-native-tab-view';
-import styled from 'styled-components/native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
-import {Colors} from '@/themes/Colors';
+import {StyleSheet, View} from 'react-native';
 import moment from 'moment';
+import {Colors} from '@/themes/Colors';
+import * as React from 'react';
+import styled from 'styled-components/native';
 
 LocaleConfig.locales['vn'] = {
   monthNames: [
@@ -37,23 +26,15 @@ LocaleConfig.locales['vn'] = {
 
 LocaleConfig.defaultLocale = 'vn';
 
-const FirstRoute = () => (
-  <View style={[styles.scene, {backgroundColor: Colors.white}]} />
-);
-
-const SecondRoute = () => (
-  <View style={[styles.scene, {backgroundColor: Colors.anti_flashWhite}]}>
+export const HistoryCalendalScreen = () => (
+  <View style={[styles.scene, styles.history]}>
     <Calendar
-      style={{
-        height: 800,
-        marginTop: 8,
-      }}
       // Initially visible month. Default = now
-      initialDate={'2012-03-01'}
+      initialDate={'2022-07-26'}
       // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-      minDate={'2012-05-10'}
+      minDate={'2022-07-01'}
       // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-      maxDate={'2012-05-30'}
+      maxDate={'202-07-30'}
       // Handler which gets executed on day press. Default = undefined
       onDayPress={day => {
         console.log('selected day', day);
@@ -94,59 +75,24 @@ const SecondRoute = () => (
       // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
       disableAllTouchEventsForDisabledDays={true}
       // Replace default month and year title with custom one. the function receive a date as parameter
-      renderHeader={() => {
-        const today = moment(new Date()).format('DD/MM/YYYY').toString();
-        return (
-          <View style={styles.headerContainer}>
-            <Text style={styles.header}>Ngày {today}</Text>
-            <Text style={styles.title}>(Danh sách lịch sử chấm công)</Text>
-          </View>
-        );
-      }}
+      // renderHeader={() => {
+      //   const today = moment(new Date()).format('DD/MM/YYYY').toString();
+      //   return (
+      //     <View style={styles.headerContainer}>
+      //       <Text style={styles.header}>Ngày {today}</Text>
+      //       <Text style={styles.title}>(Danh sách lịch sử chấm công)</Text>
+      //     </View>
+      //   );
+      // }}
       // Enable the option to swipe between months. Default = false
       enableSwipeMonths={false}
       dayComponent={date => {
         return (
-          <View
-            style={{
-              width: '100%',
-              height: 100,
-              // backgroundColor: 'red',
-              borderWidth: 0.5,
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              borderColor: Colors.gray2,
-              paddingBottom: 0,
-            }}>
-            <Text
-              style={{
-                fontWeight: '400',
-                fontSize: 11,
-                lineHeight: 13,
-                color: Colors.oldSilver,
-              }}>
-              {/*{e.date.day}*/}
-              {moment(date.date).format('DD/MM').toString()}
-            </Text>
-            <Text
-              style={{
-                fontWeight: '500',
-                fontSize: 11,
-                lineHeight: 13,
-                color: Colors.green,
-              }}>
-              08:30
-            </Text>
-            <Text
-              style={{
-                fontWeight: '500',
-                fontSize: 11,
-                lineHeight: 13,
-                color: Colors.green,
-              }}>
-              18:00
-            </Text>
-          </View>
+          <DayContainer>
+            <Date>{moment(date.date).format('DD/MM').toString()}</Date>
+            <Time>08:30</Time>
+            <Time>18:00</Time>
+          </DayContainer>
         );
       }}
       theme={{
@@ -157,7 +103,7 @@ const SecondRoute = () => (
             backgroundColor: Colors.anti_flashWhite,
             height: 44,
             alignItems: 'center',
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: '400',
             fontSize: 13,
             borderWidth: 1,
@@ -168,54 +114,37 @@ const SecondRoute = () => (
   </View>
 );
 
-const initialLayout = {width: Dimensions.get('window').width};
+const DayContainer = styled.View`
+  width: 100%;
+  height: 100px;
+  border-width: 0.5px;
+  justify-content: space-evenly;
+  align-items: center;
+  border-color: ${Colors.gray2};
+  padding-bottom: 0;
+`;
 
-const renderScene = SceneMap({
-  first: FirstRoute,
-  second: SecondRoute,
-});
-export const HistoryScreen = () => {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    {key: 'first', title: 'Checkin'},
-    {key: 'second', title: 'Lich Su'},
-  ]);
+const Date = styled.Text`
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  color: ${Colors.oldSilver};
+`;
 
-  return (
-    <TabView
-      navigationState={{index, routes}}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={initialLayout}
-      style={styles.container}
-    />
-  );
-};
+const Time = styled.Text`
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 13px;
+  color: ${Colors.green1};
+`;
+
 const styles = StyleSheet.create({
-  container: {
-    marginTop: StatusBar.currentHeight,
-    paddingTop: 40,
-  },
   scene: {
     flex: 1,
   },
-  header: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: Colors.gray1,
-  },
 
-  title: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '400',
-    letterSpacing: -0.41,
-    color: Colors.oldSilver,
-  },
-
-  headerContainer: {
-    height: 64,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+  history: {
+    backgroundColor: Colors.anti_flashWhite,
+    marginTop: 8,
   },
 });
