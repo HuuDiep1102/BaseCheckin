@@ -15,17 +15,17 @@ import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 
 import {HeaderComponent} from '@/components/HeaderComponent';
-import {CheckinScreen} from '@/screens/CheckinScreen/CheckinScreen';
+import {CheckinScreen} from '@/screens/Checkin/CheckinScreen';
 
-import {MapScreen} from '@/screens/CheckinScreen/MapScreen';
-import {HistoryCalendalScreen} from '@/screens/History/HistoryCalendalScreen';
-import {CheckinActiveScreen} from '@/screens/CheckinScreen/CheckinActiveScreen';
+// import {MapScreen} from '@/screens/Checkin/components/Map';
+import {HistoryCalendarScreen} from '@/screens/History/HistoryCalendalScreen';
+// import {CheckinActiveScreen} from '@/screens/Checkin/CheckinActiveScreen';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
 const renderScene = SceneMap({
-  first: CheckinActiveScreen,
-  second: HistoryCalendalScreen,
+  first: CheckinScreen,
+  second: HistoryCalendarScreen,
 });
 
 export const renderTabBar = (props: any) => {

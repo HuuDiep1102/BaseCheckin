@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const MapScreen = () => (
+export const Map = () => (
   <View style={styles.container}>
     <MapView
       provider={PROVIDER_GOOGLE} // remove if not using Google Maps

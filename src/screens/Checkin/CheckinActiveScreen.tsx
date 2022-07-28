@@ -1,54 +1,45 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {MapScreen} from '@/screens/CheckinScreen/MapScreen';
+import {Map} from '@/screens/Checkin/components/Map';
 import {Colors} from '@/themes/Colors';
 import moment from 'moment';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
-import {StyleSheet} from 'react-native';
+import 'moment/locale/vi'; // ko co dong nay locale ko chay
+import CameraView from '@/screens/Checkin/components/Camera';
 
 export const CheckinActiveScreen = () => {
-  const [time, setTime] = useState(moment().format('hh:mm:ss'));
+  const [time, setTime] = useState(moment().format('HH:mm:ss'));
+
+  moment.locale();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime(moment().format('hh:mm:ss'));
+      setTime(moment().format('HH:mm:ss'));
     }, 1000);
-
-    // setDate(date.toLocaleDateString());
 
     return () => clearInterval(interval);
   }, [time]);
 
-  // const devices = useCameraDevices();
-  // const device = devices.back;
-
-  // React.useEffect(() => {
-  //   (async () => {
-  //     const status = await Camera.requestCameraPermission();
-  //     setHasPermission(status === 'authorized');
-  //   })();
-  // }, []);
-
   return (
     <Container>
       <DateTimeContainer>
-        <Date>Thứ {moment().format('DD/MM/YYYY')}</Date>
+        <Date>
+          {moment().locale('vi').format('dddd')}, {moment().format('L')}
+        </Date>
         <Time>{time}</Time>
       </DateTimeContainer>
       <MapContainer>
-        <MapScreen />
+        <Map />
       </MapContainer>
       <CameraContainer>
-        {/*<Camera*/}
-        {/*  style={StyleSheet.absoluteFill}*/}
-        {/*  device={device}*/}
-        {/*  isActive={true}*/}
-        {/*/>*/}
+        <CameraView />
       </CameraContainer>
       <ButtonContainer>
         <CheckinButton>
           <CheckinButtonText>CHẤM CÔNG</CheckinButtonText>
         </CheckinButton>
+        <CheckinClientContainer>
+          <CheckinClientText>CO - Chấm công mobile</CheckinClientText>
+        </CheckinClientContainer>
       </ButtonContainer>
     </Container>
   );
@@ -69,10 +60,12 @@ const DateTimeContainer = styled.View`
 const Date = styled.Text`
   font-size: 20px;
   font-weight: 500;
+  text-transform: capitalize;
+  color: ${Colors.black};
 `;
 
 const Time = styled.Text`
-  font-size: 35px;
+  font-size: 40px;
   color: ${Colors.azure};
   font-weight: 600;
   padding-top: 10px;
@@ -81,11 +74,17 @@ const Time = styled.Text`
 const MapContainer = styled.View`
   flex: 1;
   align-items: center;
-  margin-top: -80px;
+  margin-top: -40px;
 `;
 
 const CameraContainer = styled.View`
-  flex: 1;
+  flex: 2;
+  margin-left: 10%;
+  margin-top: -25px;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 80%;
 `;
 
 const ButtonContainer = styled.View`
@@ -95,17 +94,35 @@ const ButtonContainer = styled.View`
 `;
 
 const CheckinButton = styled.TouchableOpacity`
-  height: 64px;
-  width: 80%;
+  height: 55px;
+  width: 76%;
   justify-content: center;
   align-items: center;
-  border-radius: 25px;
+  border-radius: 20px;
   border-color: ${Colors.green2};
   border-width: 0.5px;
+  margin-top: 30px;
+  margin-bottom: 15px;
 `;
 
 const CheckinButtonText = styled.Text`
-  font-size: 25px;
+  font-size: 20px;
   color: ${Colors.green2};
   font-weight: 500;
+`;
+
+const CheckinClientContainer = styled.TouchableOpacity`
+  height: 30px;
+  width: 44%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  background-color: antiquewhite;
+`;
+
+const CheckinClientText = styled.Text`
+  font-size: 13px;
+  color: ${Colors.green2};
+  font-weight: 400;
 `;

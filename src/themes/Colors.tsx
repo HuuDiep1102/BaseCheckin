@@ -17,7 +17,6 @@ export const Colors = {
   transparent: 'transparent',
   antiFlashWhite: '#f0f0f0',
   aliceBlue: '#f2f2fc',
-  black5: `rgba(0, 0, 0, 0.1)`,
   gray2: `rgba(0, 0, 0, 0.1)`,
   azure: '#007AFF',
   green1: '#27AE60',

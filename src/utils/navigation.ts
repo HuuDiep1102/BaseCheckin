@@ -2,9 +2,11 @@ import React from 'react';
 import {DrawerActions, NavigationContainerRef} from '@react-navigation/native';
 
 import {TransitionPresets} from '@react-navigation/stack';
-import {LoginScreen} from '@/screens/Login/LoginScreen';
+import { LoginScreen } from '@/screens/Login/LoginScreen';
 
 import {HistoryScreen} from '@/screens/History/HistoryScreen';
+
+import {CheckinActiveScreen} from '@/screens/Checkin/CheckinActiveScreen';
 
 // import {DetailScreenProps, CreateScreenProps} from '@/types';
 
@@ -28,5 +30,9 @@ export const openDrawer = () =>
 export const navigateToLoginScreen = createNavigate('LoginScreen');
 
 export const navigateToHistoryScreen = createNavigate('HistoryScreen');
+
+export const navigateToCheckinActiveScreen = createNavigate(
+  'CheckinActiveScreen',
+);
 
 export const navigateToMainNavigation = createNavigate('MainNavigation');
