@@ -1,59 +1,92 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import {IC_BASE_ME, IC_EMAIL, IC_LOCK, IMG_BANNER} from '@/assets';
-import {navigateToHistoryScreen} from '@/utils/navigation';
+import {
+  navigateToHomeScreen,
+  replaceWithCheckinScreen,
+} from '@/utils/navigation';
+import {Alert, ActivityIndicator} from 'react-native';
+import {useAsyncFn} from 'react-use';
+import {requestLogin} from '@/store/login/functions';
+import CustomTextInput from '@/components/TextInput';
 
-export const LoginScreen = () => {
+export const LoginScreen = memo(() => {
+  const [account, setAccount] = useState({
+    email: '',
+    password: '',
+  });
+
+  const [{loading}, onLogin] = useAsyncFn(async () => {
+    if (!account.password || !account.password) {
+      Alert.alert('', 'Vui lòng nhập email và mật khẩu', [{text: 'OK'}]);
+      return;
+    }
+    const res = await requestLogin(account.email, account.password);
+
+    if (res === 0) {
+      Alert.alert(
+        'Không thể đăng nhập',
+        'Email hoặc mật khẩu không chính xác',
+        [{text: 'OK'}],
+      );
+    } else {
+      navigateToHomeScreen();
+    }
+  }, [navigateToHomeScreen, account]);
+
+  const onChangeValue = useCallback((keyName: string, value: string) => {
+    setAccount(prev => ({
+      ...prev,
+      [keyName]: value,
+    }));
+  }, []);
+
   return (
     <Container>
       <HeaderConatiner>
         <LogoApp source={IC_BASE_ME} />
       </HeaderConatiner>
       <SectionContainer>
-        <BannerImage resizeMode={'contain'} source={IMG_BANNER} />
+        <BannerImage resizeMode={'stretch'} source={IMG_BANNER} />
         <LoginInputContainer>
-          <EmailInputContainer>
-            <Logo source={IC_EMAIL} />
-            <Input
-              placeholder="Email"
-              placeholderTextColor={Colors.oldSilver}></Input>
-          </EmailInputContainer>
-          <PassWordInputContainer>
-            <Logo source={IC_LOCK} />
-            <Input
-              placeholder="Mật khẩu"
-              placeholderTextColor={Colors.oldSilver}></Input>
-          </PassWordInputContainer>
+          <CustomTextInput
+            icon={IC_EMAIL}
+            label={'Email'}
+            keyName={'email'}
+            value={account.email}
+            keyboardType={'email-address'}
+            onChangeValue={onChangeValue}
+          />
+          <CustomTextInput
+            secureTextEntry
+            icon={IC_LOCK}
+            label={'Mật khẩu'}
+            keyName={'password'}
+            value={account.password}
+            onChangeValue={onChangeValue}
+          />
+
           <ForgotPassWordContainer>
             <ForgotPassWordText>Quên mật khẩu?</ForgotPassWordText>
           </ForgotPassWordContainer>
         </LoginInputContainer>
         <FooterContainer>
           <WrapButton>
-            <BtnLogin onPress={navigateToHistoryScreen}>
+            <BtnLogin onPress={onLogin}>
               <BtnLoginText>ĐĂNG NHẬP</BtnLoginText>
+              {loading && <ActivityIndicator style={{marginLeft: 10}} />}
             </BtnLogin>
           </WrapButton>
         </FooterContainer>
       </SectionContainer>
     </Container>
   );
-};
+});
 const BannerImage = styled.Image`
   position: absolute;
   height: 456.93px;
-  width: 375px;
+  width: 100%;
   bottom: 0;
   opacity: 0.2;
   z-index: -1;
@@ -79,53 +112,17 @@ const LogoApp = styled.Image`
 `;
 
 const LoginInputContainer = styled.View`
-  padding-top: 20px;
+  padding-top: 42px;
   flex: 1;
-  //background-color: yellow;
   justify-content: center;
   align-items: center;
 `;
 
-const EmailInputContainer = styled.View`
-  height: 40px;
-  width: 80%;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: ${Colors.gray};
-  flex-direction: row;
-`;
-
-const Logo = styled.Image`
-  height: 20px;
-  width: 20px;
-  align-self: center;
-  padding-right: 12px;
-`;
-
-const Input = styled.TextInput`
-  width: 80%;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 20px;
-  color: ${Colors.oldSilver};
-  padding-left: 12px;
-`;
-
-const PassWordInputContainer = styled.View`
-  height: 40px;
-  width: 80%;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: ${Colors.gray};
-  flex-direction: row;
-  margin-top: 40px;
-`;
-
 const ForgotPassWordContainer = styled.TouchableOpacity`
   height: 64px;
-  width: 77%;
-  padding-top: 25px;
-  align-items: flex-end;
+  width: 150px;
+  padding-right: 10%;
+  align-self: flex-end;
 `;
 const ForgotPassWordText = styled.Text`
   height: 64px;
@@ -144,7 +141,7 @@ const FooterContainer = styled.View`
 `;
 
 const WrapButton = styled.View`
-  padding-bottom: 35px;
+  padding-bottom: 30px;
 `;
 
 const BtnLogin = styled.TouchableOpacity`
@@ -156,6 +153,7 @@ const BtnLogin = styled.TouchableOpacity`
   border-radius: 34px;
   border-width: 1px;
   border-color: ${Colors.azure};
+  flex-direction: row;
 `;
 
 const BtnLoginText = styled.Text`

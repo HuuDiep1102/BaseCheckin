@@ -1,12 +1,16 @@
 import React from 'react';
-import {DrawerActions, NavigationContainerRef} from '@react-navigation/native';
+import {
+  DrawerActions,
+  NavigationContainerRef,
+  StackActions,
+} from '@react-navigation/native';
 
 import {TransitionPresets} from '@react-navigation/stack';
-import { LoginScreen } from '@/screens/Login/LoginScreen';
+import {LoginScreen} from '@/screens/Login/LoginScreen';
 
-import {HistoryScreen} from '@/screens/History/HistoryScreen';
+import {HomeScreen} from '@/screens/Home/HomeScreen';
 
-import {CheckinActiveScreen} from '@/screens/Checkin/CheckinActiveScreen';
+import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
 
 // import {DetailScreenProps, CreateScreenProps} from '@/types';
 
@@ -22,17 +26,25 @@ export const createNavigate =
     return navigation().navigate(screenName, params);
   };
 
+export const createReplace =
+  <T extends object>(screenName: string) =>
+  (params?: T) => {
+    return navigation().dispatch(StackActions.replace(screenName, params));
+  };
+
 export const goBack = () => navigation().goBack();
 
 export const openDrawer = () =>
   navigation().dispatch(DrawerActions.openDrawer());
 
+export const replaceWithCheckinScreen = createReplace('HomeScreen');
+
 export const navigateToLoginScreen = createNavigate('LoginScreen');
 
-export const navigateToHistoryScreen = createNavigate('HistoryScreen');
+export const navigateToHomeScreen = createNavigate('HomeScreen');
 
-export const navigateToCheckinActiveScreen = createNavigate(
-  'CheckinActiveScreen',
+export const navigateToCheckInActiveScreen = createNavigate(
+  'CheckInActiveScreen',
 );
 
 export const navigateToMainNavigation = createNavigate('MainNavigation');

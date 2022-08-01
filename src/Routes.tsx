@@ -1,8 +1,7 @@
 import React, {memo, useCallback} from 'react';
-// import {HistoryScreen} from '@/screens/History/HistoryScreen';
 import {WelcomeScreen} from '@/screens/Login/WelcomeScreen';
 import {LoginScreen} from '@/screens/Login/LoginScreen';
-import {HistoryScreen} from '@/screens/History/HistoryScreen';
+import {HomeScreen} from '@/screens/Home/HomeScreen';
 import {navigationRef} from '@/utils/navigation';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -16,7 +15,7 @@ const MainStackComponent = memo(function MainStackComponent() {
       initialRouteName="LoginScreen"
       screenOptions={{headerShown: false}}>
       <MainStack.Screen name="LoginScreen" component={LoginScreen} />
-      <MainStack.Screen name="HistoryScreen" component={HistoryScreen} />
+      <MainStack.Screen name="HomeScreen" component={HomeScreen} />
     </MainStack.Navigator>
   );
 });

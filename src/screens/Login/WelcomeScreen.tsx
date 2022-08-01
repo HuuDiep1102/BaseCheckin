@@ -1,32 +1,19 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React from 'react';
+import React, {memo} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import {IC_BASE_ME} from '@/assets';
 import {navigateToMainNavigation} from '@/utils/navigation';
 
-export const WelcomeScreen = () => {
-  console.log('Welcome');
+export const WelcomeScreen = memo(() => {
   return (
     <WelcomeScreenContainer>
-      <HeaderConatiner>
+      <HeaderContainer>
         <LogoApp source={IC_BASE_ME} />
-      </HeaderConatiner>
+      </HeaderContainer>
       <BannerContainer>
         <BannerText>Base Me</BannerText>
         <TitleText>
-          {
-            'Giải pháp quản lý công việc \n & dự án toàn diện cho doanh nghiệp 4.0'
-          }
+          {'Giải pháp quản lý thông tin nhân sự \n cho doanh nghiệp 4.0'}
         </TitleText>
       </BannerContainer>
       <FooterContainer>
@@ -39,14 +26,14 @@ export const WelcomeScreen = () => {
       </FooterContainer>
     </WelcomeScreenContainer>
   );
-};
+});
 
 const WelcomeScreenContainer = styled.View`
   flex: 1;
   background-color: ${Colors.white};
 `;
 
-const HeaderConatiner = styled.View`
+const HeaderContainer = styled.View`
   flex: 1;
   justify-content: flex-end;
   align-items: center;
@@ -64,7 +51,7 @@ const BannerContainer = styled.View`
 const BannerText = styled.Text`
   font-weight: 700;
   font-size: 30px;
-  line-height: 35.16px;
+  line-height: 35px;
   text-align: center;
   padding-top: 39px;
   padding-bottom: 7px;
@@ -74,7 +61,9 @@ const BannerText = styled.Text`
 const TitleText = styled.Text`
   font-weight: 400;
   font-size: 15px;
+  line-height: 18px;
   text-align: center;
+  color: ${Colors.darkCharcoal};
 `;
 
 const FooterContainer = styled.View`
@@ -87,7 +76,7 @@ const WarningText = styled.Text`
   font-weight: 400;
   line-height: 20px;
   padding-bottom: 29px;
-  padding-top: 50px;
+  padding-top: 80px;
   color: ${Colors.oldSilver};
 `;
 

@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import 'react-native-gesture-handler';
@@ -6,15 +6,12 @@ import 'react-native-gesture-handler';
 interface SelectItemProps {
   title: string;
   icon: any;
-  clientCheckin?: string;
+  clientCheckIn?: string;
   onPress: () => void;
-  keyName: string;
   active: boolean | undefined;
 }
 export const SelectItem = memo((props: SelectItemProps) => {
-  const {title, icon, clientCheckin, onPress, active, keyName} = props;
-
-  // const [isActive, setActive] = useState(false);
+  const {title, icon, clientCheckIn, onPress, active} = props;
 
   return (
     <Container>
@@ -22,7 +19,7 @@ export const SelectItem = memo((props: SelectItemProps) => {
         <Icon source={icon} />
         <TextContainer>
           <TitleText>{title}</TitleText>
-          {clientCheckin && <DevicesText>{clientCheckin}</DevicesText>}
+          {clientCheckIn && <DevicesText>{clientCheckIn}</DevicesText>}
         </TextContainer>
         <ActiveText isActive={active}>
           {active ? 'Enable' : 'Disable'}

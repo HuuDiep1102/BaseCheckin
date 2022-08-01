@@ -1,16 +1,21 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {SelectItem} from '@/components/SelectItem';
 import {IC_CAMERA, IC_CHECKIN, IC_LOCATION} from '@/assets';
 import * as React from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
-import {useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useState} from 'react';
 import {checkPermission, PERMISSIONS_TYPE} from '@/utils/permissions';
-import {CheckinActiveScreen} from '@/screens/Checkin/CheckinActiveScreen';
+import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
 import Modal from 'react-native-modal';
 import {getBottomSpace} from 'react-native-iphone-x-helper';
+import {MobileClient, PayloadPostClientsProps, RawClient} from '@/types';
+import {useClient, useMobileClients} from '@/store/login';
+import {useAsyncFn} from 'react-use';
+import {defaultParams} from '@/utils';
+import {getClients} from '@/store/login/functions';
 
-export const CheckinScreen = () => {
+export const CheckInScreen = memo(() => {
   const [isPermission, setPermission] = useState();
 
   const [isClient, setClient] = useState(false);
@@ -19,9 +24,41 @@ export const CheckinScreen = () => {
 
   const [isLocation, setLocation] = useState(false);
 
-  const [isCheckin, setCheckin] = useState(false);
+  const [isCheckIn, setCheckIn] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  const client: RawClient = useClient();
+
+  const [{}, getMobileClients] = useAsyncFn(async () => {
+    if (!client.access_token || !client.client_key) {
+      return null;
+    }
+
+    const payload: PayloadPostClientsProps = {
+      lat: 112,
+      lng: 111,
+      access_token: client.access_token,
+      client_key: client.client_key,
+      ...defaultParams,
+    };
+
+    await getClients(payload);
+  }, [client]);
+
+  useEffect(() => {
+    getMobileClients().then();
+  }, []);
+
+  const mobileClients: MobileClient[] = useMobileClients();
+
+  console.log('client', mobileClients);
+
+  // const [permission, setPermission] = useState({
+  //   checkin: false,
+  //   camera: false,
+  //   location: false,
+  // });
 
   const onBackdrop = useCallback(() => {
     setModalVisible(false);
@@ -47,30 +84,21 @@ export const CheckinScreen = () => {
   const onPickClient = useCallback(() => {
     setClient(true);
     setModalVisible(false);
-  }, [isClient, modalVisible]);
-
-  // useEffect(() => {
-  //   setCamera(isCamera);
-  // }, [isCamera]);
-  //
-  // useEffect(() => {
-  //   setLocation(isCamera);
-  // }, [isLocation]);
+  }, []);
 
   useEffect(() => {
-    setCheckin(isClient && isCamera && isLocation);
+    (async () => {
+      await onPermission(PERMISSIONS_TYPE.camera);
+      await onPermission(PERMISSIONS_TYPE.location);
+    })();
+  }, []);
+
+  useEffect(() => {
+    setCheckIn(isClient && isCamera && isLocation);
   }, [isClient, isCamera, isLocation]);
 
-  console.log('isCheckin', isCheckin);
-
-  console.log('isCamera', isCamera);
-
-  console.log('isLocation', isLocation);
-
-  console.log('isClient', isClient);
-
   return (
-    <View style={[styles.scene, styles.checkin]}>
+    <View style={[styles.scene, styles.checkIn]}>
       <Modal
         style={styles.modal}
         isVisible={modalVisible}
@@ -81,47 +109,43 @@ export const CheckinScreen = () => {
           <ModalView>
             <InputContactContainer>
               <NoteSelectContainer>
-                <NoteText>Select checkin client</NoteText>
+                <NoteText>Select CheckIn client</NoteText>
               </NoteSelectContainer>
-              <SelectButton onPress={onPickClient}>
-                <TitleText>Mobile Client</TitleText>
-              </SelectButton>
-              <SelectButton onPress={onPickClient}>
-                <TitleText>47 Nguyễn Tuân</TitleText>
-              </SelectButton>
-              <SelectButton onPress={onPickClient}>
-                <TitleText>WFH</TitleText>
-              </SelectButton>
-              <SelectButton onPress={onPickClient}>
-                <TitleText>47 Nguyễn Tuân - dự phòng</TitleText>
-              </SelectButton>
+              <ScrollView>
+                {mobileClients.length > 0 &&
+                  mobileClients.map((item, index) => {
+                    return (
+                      <SelectButton key={index} onPress={onPickClient}>
+                        <TitleText>{item.name}</TitleText>
+                      </SelectButton>
+                    );
+                  })}
+              </ScrollView>
             </InputContactContainer>
           </ModalView>
         </CenteredView>
       </Modal>
-      {isCheckin ? (
-        <CheckinActiveScreen />
+      {isCheckIn ? (
+        <CheckInActiveScreen />
       ) : (
         <>
           <NoteContainer>
             <TextNote>
-              Để có thể sử dụng tính năng checkin bạn vui lòng chọn thao tác
+              Để có thể sử dụng tính năng CheckIn bạn vui lòng chọn thao tác
               Anable/disable
             </TextNote>
           </NoteContainer>
           <SelectContainer>
             <SelectItem
-              title="Checkin client"
+              title="CheckIn client"
               icon={IC_CHECKIN}
-              clientCheckin={'Mobile Checkin'}
+              clientCheckIn={'Mobile CheckIn'}
               onPress={onSelectClient}
-              keyName="Checkin"
               active={isClient}
             />
             <SelectItem
               title="Camera"
               icon={IC_CAMERA}
-              keyName="Camera"
               onPress={async () => {
                 await onPermission(PERMISSIONS_TYPE.camera, true);
               }}
@@ -130,7 +154,6 @@ export const CheckinScreen = () => {
             <SelectItem
               title="Location"
               icon={IC_LOCATION}
-              keyName="Location"
               onPress={async () =>
                 await onPermission(PERMISSIONS_TYPE.location, true)
               }
@@ -141,7 +164,7 @@ export const CheckinScreen = () => {
       )}
     </View>
   );
-};
+});
 
 const NoteContainer = styled.View`
   height: 64px;
@@ -168,7 +191,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  checkin: {
+  checkIn: {
     backgroundColor: Colors.white,
     marginTop: 8,
   },
