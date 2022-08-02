@@ -52,6 +52,8 @@ export const CheckInScreen = memo(() => {
 
   const mobileClients: MobileClient[] = useMobileClients();
 
+  const [selectedClient, setSelectedClient] = useState<MobileClient>();
+
   console.log('client', mobileClients);
 
   // const [permission, setPermission] = useState({
@@ -126,7 +128,7 @@ export const CheckInScreen = memo(() => {
         </CenteredView>
       </Modal>
       {isCheckIn ? (
-        <CheckInActiveScreen />
+        <CheckInActiveScreen selectedClient={selectedClient} />
       ) : (
         <>
           <NoteContainer>

@@ -5,9 +5,12 @@ import {newFormData} from '@/utils';
 export const requestGetHistory = async (params: any) => {
   const formData = newFormData(params);
 
-  const {data} = await Fetch.post('checkin.base.vn/ajax/api/me/logs', formData);
+  const {data} = await Fetch.post(
+    'checkin.base.vn/ajax/api/me/logs?',
+    formData,
+  );
 
-  console.log('data', data);
+  console.log('history', data);
 
   if (!data) {
     return [];

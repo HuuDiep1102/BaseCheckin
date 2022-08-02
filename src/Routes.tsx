@@ -5,6 +5,7 @@ import {HomeScreen} from '@/screens/Home/HomeScreen';
 import {navigationRef} from '@/utils/navigation';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {PreloadScreen} from '@/screens/PreloadScreen';
 
 const RootStack = createNativeStackNavigator();
 const MainStack = createNativeStackNavigator();
@@ -12,8 +13,10 @@ const MainStack = createNativeStackNavigator();
 const MainStackComponent = memo(function MainStackComponent() {
   return (
     <MainStack.Navigator
-      initialRouteName="LoginScreen"
+      initialRouteName="PreloadScreen"
       screenOptions={{headerShown: false}}>
+      <RootStack.Screen name="PreloadScreen" component={PreloadScreen} />
+      <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
       <MainStack.Screen name="LoginScreen" component={LoginScreen} />
       <MainStack.Screen name="HomeScreen" component={HomeScreen} />
     </MainStack.Navigator>
@@ -35,9 +38,8 @@ const Routes = memo(function Routes() {
   return (
     <NavigationContainer ref={navigationRef} onStateChange={onStateChange}>
       <RootStack.Navigator
-        initialRouteName="WelcomeScreen"
+        initialRouteName="MainNavigation"
         screenOptions={{headerShown: false}}>
-        <RootStack.Screen name="WelcomeScreen" component={WelcomeScreen} />
         <RootStack.Screen
           name="MainNavigation"
           component={MainStackComponent}

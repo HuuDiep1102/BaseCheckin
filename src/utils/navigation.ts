@@ -41,6 +41,8 @@ export const replaceWithCheckinScreen = createReplace('HomeScreen');
 
 export const navigateToLoginScreen = createNavigate('LoginScreen');
 
+export const replaceWithLoginScreen = createReplace('LoginScreen');
+
 export const navigateToHomeScreen = createNavigate('HomeScreen');
 
 export const navigateToCheckInActiveScreen = createNavigate(

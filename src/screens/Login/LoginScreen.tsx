@@ -31,9 +31,9 @@ export const LoginScreen = memo(() => {
         [{text: 'OK'}],
       );
     } else {
-      navigateToHomeScreen();
+      replaceWithCheckinScreen();
     }
-  }, [navigateToHomeScreen, account]);
+  }, [replaceWithCheckinScreen, account]);
 
   const onChangeValue = useCallback((keyName: string, value: string) => {
     setAccount(prev => ({
