@@ -54,8 +54,8 @@ export const CheckInActiveScreen = memo(
         : undefined;
     }, [latitude, longitude]);
 
-    const [{loading, error}, submitCheckin] = useAsyncFn(async () => {
-      if (!cameraRef?.current || !latitude || !longitude || !selectedClient) {
+    const [{loading}, submitCheckin] = useAsyncFn(async () => {
+      if (!cameraRef?.current || !latitude || !longitude) {
         return null;
       }
 
@@ -71,13 +71,17 @@ export const CheckInActiveScreen = memo(
         client_key: client.client_key,
         lat: latitude,
         lng: longitude,
-        client_id: selectedClient?.id,
+        client_id: 240,
         photo: photo.path,
         ts,
         ...defaultParams,
       };
 
-      const res = await requestCheckin(params);
+      try {
+        const res = await requestCheckin(params);
+      } catch (e) {
+        console.log('eee ', e);
+      }
 
       Alert.alert(
         '',
@@ -87,7 +91,6 @@ export const CheckInActiveScreen = memo(
         [{text: 'OK'}],
       );
     }, [latitude, longitude, cameraRef]);
-    console.log(error);
 
     return (
       <Container>

@@ -9,10 +9,11 @@ export const newFormData = (payload: {[key: string]: any}) => {
         name: 'checkin.jpg',
       });
     } else {
+      console.log(key, payload[key]);
       _formData.append(key, payload[key]);
     }
   });
-
+  console.log('kijfklwe', _formData);
   return _formData;
 };
 

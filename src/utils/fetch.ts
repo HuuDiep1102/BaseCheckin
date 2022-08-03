@@ -2,10 +2,12 @@ import axios from 'axios';
 import {Core} from '@/global';
 
 export const Fetch = axios.create({
-  baseURL: Core.baseUrl,
+  // baseURL: Core.baseUrl,
   headers: {
     'Content-Type': 'multipart/form-data',
   },
-
-  transformRequest: data => data,
+  // transformRequest: (data, header) => {
+  //   console.log('TRANS', data);
+  //   return data;
+  // },
 });

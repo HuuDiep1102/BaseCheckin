@@ -7,7 +7,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 interface HeaderComponentProps {
   title: string;
 }
-export const HeaderComponent = (props: HeaderComponentProps) => {
+export const HeaderComponent = memo((props: HeaderComponentProps) => {
   const {title} = props;
 
   return (
@@ -15,7 +15,7 @@ export const HeaderComponent = (props: HeaderComponentProps) => {
       <HeaderText>{title}</HeaderText>
     </HeaderContainer>
   );
-};
+});
 
 const HeaderContainer = styled.View`
   height: ${44 + getStatusBarHeight()}px;

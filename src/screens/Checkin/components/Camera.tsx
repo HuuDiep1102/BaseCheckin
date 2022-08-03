@@ -10,7 +10,7 @@ const LoadingView = styled.View`
   background-color: ${Colors.yellowOrange};
 `;
 
-const CameraView = (props: any, ref: any) => {
+const CameraView = ((props: any, ref: any) => {
   const devices = useCameraDevices();
   const device = devices.front;
 
@@ -21,7 +21,7 @@ const CameraView = (props: any, ref: any) => {
   return (
     <Camera ref={ref} device={device} isActive photo style={styles.camera} />
   );
-};
+});
 
 const styles = StyleSheet.create({
   camera: {

@@ -9,7 +9,7 @@ import {
 import {Alert, ActivityIndicator, Platform} from 'react-native';
 import {useAsyncFn} from 'react-use';
 import {requestLogin} from '@/store/login/functions';
-import CustomTextInput from '@/components/TextInput';
+import {CustomTextInput} from '@/components/TextInput';
 import {css} from 'styled-components';
 
 export const LoginScreen = memo(() => {

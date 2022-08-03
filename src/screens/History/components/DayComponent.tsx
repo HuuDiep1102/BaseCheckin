@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {memo, useEffect, useMemo} from 'react';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
 import {ScrollView, StyleSheet, TextInputProps} from 'react-native';
@@ -6,15 +6,16 @@ import Modal from 'react-native-modal';
 import moment from 'moment';
 import {getBottomSpace} from 'react-native-iphone-x-helper';
 import {useHistory} from '@/store/history';
-import useBoolean from '@/hooks/useBoolean';
+import {useBoolean} from '@/hooks/useBoolean';
 import {RawHistory} from '@/types';
+import {toString} from 'lodash';
 
 interface Props extends TextInputProps {
   date: any;
   isDayInMonth: boolean;
 }
 
-export const DayComponent = (props: Props) => {
+export const DayComponent = memo((props: Props) => {
   const {date, isDayInMonth} = props;
 
   const [modalVisible, showModalVisible, hideModalVisible] = useBoolean(false); //Khong can viet thanh ham nua
@@ -23,59 +24,63 @@ export const DayComponent = (props: Props) => {
 
   const history: RawHistory = useHistory(date);
 
-  const element = <><>
-    <Modal
-      style={styles.modal}
-      isVisible={modalVisible}
-      hasBackdrop={true}
-      statusBarTranslucent={true}
-      onBackdropPress={hideModalVisible}
-      onSwipeComplete={hideModalVisible}
-      swipeThreshold={20}
-      swipeDirection="down">
-      <CenteredView>
-        <ModalView>
-          <InputContactContainer>
-            <NoteSelectContainer>
-              <NoteText>
-                {moment(date).locale('vi').format('dddd')},{' '}
-                {moment(date).format('L')}
-              </NoteText>
-            </NoteSelectContainer>
-            <ScrollView style={styles.scroll}>
-              {history?.logs.length > 0 &&
-                history?.logs.map((log, index) => (
-                  <LogTime>
-                    <TitleText key={index}>
-                      {moment.unix(log.time).format('DD/MM')}{' '}
-                      {moment.unix(log.time).format('HH:mm:ss')}
-                    </TitleText>
-                    <DeatailText>
-                      IP: {log.ip} - Văn phòng: True Platform HQ
-                    </DeatailText>
-                  </LogTime>
-                ))}
-            </ScrollView>
-          </InputContactContainer>
-        </ModalView>
-      </CenteredView>
-    </Modal>
+  console.log('hisorting', history?.logs);
 
-    <DayContainer disabled={!isDayInMonth} onPress={showModalVisible}>
-      <Date color={color}>{moment(date).format('DD/MM').toString()}</Date>
-      {isDayInMonth && history?.logs.length > 0 && (
-        <>
-          {history?.logs.length > 0 &&
-            history?.logs.map((log, index) => (
-              <Time key={index}>{moment.unix(log.time).format('HH:mm')}</Time>
-            ))}
-        </>
-      )}
-    </DayContainer>
-  </>
-  </>;
-  return element;
-};
+  const dateTitle = moment(date).format('DD/MM').toString();
+
+  return (
+    <>
+      <Modal
+        style={styles.modal}
+        isVisible={modalVisible}
+        hasBackdrop={true}
+        statusBarTranslucent={true}
+        onBackdropPress={hideModalVisible}
+        onSwipeComplete={hideModalVisible}
+        swipeThreshold={20}
+        swipeDirection="down">
+        <CenteredView>
+          <ModalView>
+            <InputContactContainer>
+              <NoteSelectContainer>
+                <NoteText>
+                  {moment(date).locale('vi').format('dddd')},{' '}
+                  {moment(date).format('L')}
+                </NoteText>
+              </NoteSelectContainer>
+              <ScrollView style={styles.scroll}>
+                {history?.logs.length > 0 &&
+                  history?.logs.map((log, index) => (
+                    <LogTime>
+                      <TitleText key={index}>
+                        {moment.unix(log.time).format('DD/MM')}{' '}
+                        {moment.unix(log.time).format('HH:mm:ss')}
+                      </TitleText>
+                      <DeatailText>
+                        IP: {log.ip} - Văn phòng: True Platform HQ
+                      </DeatailText>
+                    </LogTime>
+                  ))}
+              </ScrollView>
+            </InputContactContainer>
+          </ModalView>
+        </CenteredView>
+      </Modal>
+
+      <DayContainer disabled={!isDayInMonth} onPress={showModalVisible}>
+        <Date color={color}>{dateTitle}</Date>
+        {isDayInMonth && history?.logs.length > 0 && (
+          <>
+            {history?.logs.length > 0 &&
+              history?.logs.map((log, index) => (
+                <Time key={index}>{moment.unix(log.time).format('HH:mm')}</Time>
+              ))}
+          </>
+        )}
+      </DayContainer>
+    </>
+  );
+});
 
 const NoteSelectContainer = styled.View`
   border-bottom-width: 0.5px;

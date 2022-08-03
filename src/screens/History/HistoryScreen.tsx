@@ -2,14 +2,7 @@ import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import moment from 'moment';
 import {Colors} from '@/themes/Colors';
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-  Component,
-  PropsWithChildren,
-} from 'react';
+import React, {memo, useCallback, useEffect, useState} from 'react';
 import {DayComponent} from '@/screens/History/components/DayComponent';
 import {RawClient} from '@/types';
 import {useClient} from '@/store/login';
@@ -119,6 +112,7 @@ export const HistoryScreen = memo(() => {
   }, []);
 
   const onMonthChange = useCallback((date: DateData) => {
+    console.log(date.dateString);
     setSelectedDate(date.dateString);
   }, []);
 
@@ -141,6 +135,8 @@ export const HistoryScreen = memo(() => {
 
       const dateString = date.date?.dateString;
 
+      // const dateString = selectedDate.dateString;
+
       const isDayInMonth = selectedMonth === date?.date?.month;
 
       return <DayComponent date={dateString} isDayInMonth={isDayInMonth} />;
@@ -158,15 +154,17 @@ export const HistoryScreen = memo(() => {
         }>
         <Calendar
           style={styles.calendar}
-          monthFormat={'yyyy MM'}
+          monthFormat={'yyyy MM dd'}
           onMonthChange={onMonthChange}
           disableMonthChange={true}
           firstDay={1}
           onPressArrowLeft={onPressArrowRight}
           onPressArrowRight={onPressArrowLeft}
-          renderHeader={date => renderHeader(date)}
+          renderHeader={renderHeader}
           dayComponent={renderDayComponent}
           theme={themes}
+          disableAllTouchEventsForDisabledDays={true}
+          disableAllTouchEventsForInactiveDays
         />
       </ScrollView>
     </View>

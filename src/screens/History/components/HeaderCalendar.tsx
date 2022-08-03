@@ -7,7 +7,7 @@ interface Props {
   date?: any;
 }
 
-export const HeaderCalendar = (props: Props) => {
+export const HeaderCalendar = memo((props: Props) => {
   const {date} = props;
 
   const _date = moment(date);
@@ -24,7 +24,7 @@ export const HeaderCalendar = (props: Props) => {
       <DateTextHeader>(Danh sách lịch sử chấm công)</DateTextHeader>
     </HeaderContainer>
   );
-};
+});
 
 const HeaderContainer = styled.View`
   height: 64px;

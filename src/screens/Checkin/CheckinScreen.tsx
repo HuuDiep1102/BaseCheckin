@@ -14,7 +14,6 @@ import {useClient, useMobileClients} from '@/store/login';
 import {useAsyncFn} from 'react-use';
 import {defaultParams} from '@/utils';
 import {getClients} from '@/store/login/functions';
-import useBoolean from '@/hooks/useBoolean';
 
 export const CheckInScreen = memo(() => {
   const [isPermission, setPermission] = useState();
@@ -27,7 +26,7 @@ export const CheckInScreen = memo(() => {
 
   const [isCheckIn, setCheckIn] = useState(false);
 
-  const [modalVisible, showModalVisible, hideModalVisible] = useBoolean(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const client: RawClient = useClient();
 
@@ -55,15 +54,20 @@ export const CheckInScreen = memo(() => {
 
   const [selectedClient, setSelectedClient] = useState<MobileClient>();
 
+  console.log('client', mobileClients);
+
   // const [permission, setPermission] = useState({
   //   checkin: false,
   //   camera: false,
   //   location: false,
   // });
 
-  const onSelectClient = useCallback((item: MobileClient) => {
-    setSelectedClient(item);
-    hideModalVisible();
+  const onBackdrop = useCallback(() => {
+    setModalVisible(false);
+  }, []);
+
+  const onSelectClient = useCallback(() => {
+    setModalVisible(true);
   }, []);
 
   const onPermission = useCallback(
@@ -79,6 +83,11 @@ export const CheckInScreen = memo(() => {
     [],
   );
 
+  const onPickClient = useCallback(() => {
+    setClient(true);
+    setModalVisible(false);
+  }, []);
+
   useEffect(() => {
     (async () => {
       await onPermission(PERMISSIONS_TYPE.camera);
@@ -87,8 +96,8 @@ export const CheckInScreen = memo(() => {
   }, []);
 
   useEffect(() => {
-    setCheckIn(Boolean(selectedClient) && isCamera && isLocation);
-  }, [selectedClient, isCamera, isLocation]);
+    setCheckIn(isClient && isCamera && isLocation);
+  }, [isClient, isCamera, isLocation]);
 
   return (
     <View style={[styles.scene, styles.checkIn]}>
@@ -97,7 +106,7 @@ export const CheckInScreen = memo(() => {
         isVisible={modalVisible}
         hasBackdrop={true}
         statusBarTranslucent={true}
-        onBackdropPress={hideModalVisible}>
+        onBackdropPress={onBackdrop}>
         <CenteredView>
           <ModalView>
             <InputContactContainer>
@@ -108,7 +117,7 @@ export const CheckInScreen = memo(() => {
                 {mobileClients.length > 0 &&
                   mobileClients.map((item, index) => {
                     return (
-                      <SelectButton key={index} onPress={onSelectClient(item)}>
+                      <SelectButton key={index} onPress={onPickClient}>
                         <TitleText>{item.name}</TitleText>
                       </SelectButton>
                     );
@@ -133,7 +142,7 @@ export const CheckInScreen = memo(() => {
               title="CheckIn client"
               icon={IC_CHECKIN}
               clientCheckIn={'Mobile CheckIn'}
-              onPress={showModalVisible}
+              onPress={onSelectClient}
               active={isClient}
             />
             <SelectItem

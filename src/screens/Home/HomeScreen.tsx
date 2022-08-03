@@ -17,7 +17,7 @@ const renderScene = SceneMap({
   second: HistoryScreen,
 });
 
-export const renderTabBar = (props: any) => {
+const renderTabBar = (props: any) => {
   return (
     <TabBar
       {...props}
