@@ -6,10 +6,11 @@ import {
   navigateToHomeScreen,
   replaceWithCheckinScreen,
 } from '@/utils/navigation';
-import {Alert, ActivityIndicator} from 'react-native';
+import {Alert, ActivityIndicator, Platform} from 'react-native';
 import {useAsyncFn} from 'react-use';
 import {requestLogin} from '@/store/login/functions';
 import CustomTextInput from '@/components/TextInput';
+import {css} from 'styled-components';
 
 export const LoginScreen = memo(() => {
   const [account, setAccount] = useState({
@@ -48,7 +49,7 @@ export const LoginScreen = memo(() => {
         <LogoApp source={IC_BASE_ME} />
       </HeaderConatiner>
       <SectionContainer>
-        <BannerImage resizeMode={'stretch'} source={IMG_BANNER} />
+        <BannerImage resizeMode={'contain'} source={IMG_BANNER} />
         <LoginInputContainer>
           <CustomTextInput
             icon={IC_EMAIL}
@@ -112,7 +113,14 @@ const LogoApp = styled.Image`
 `;
 
 const LoginInputContainer = styled.View`
-  padding-top: 42px;
+  ${Platform.select({
+    ios: css`
+      padding-top: 100px;
+    `,
+    android: css`
+      padding-top: 100px;
+    `,
+  })};
   flex: 1;
   justify-content: center;
   align-items: center;

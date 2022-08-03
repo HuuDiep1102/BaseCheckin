@@ -25,6 +25,7 @@ const STextInput = styled.TextInput`
   letter-spacing: -0.24px;
   flex: 1;
   height: 44px;
+  color: ${Colors.black};
 `;
 
 interface Props extends TextInputProps {

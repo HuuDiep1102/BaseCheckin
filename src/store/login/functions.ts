@@ -36,7 +36,6 @@ export const requestLogin = async (email: string, password: string) => {
     'api.base.vn/ajax/mobile/login',
     loginFormData,
   );
-  console.log('login ', data);
   if (!data) {
     return null;
   }
@@ -90,8 +89,6 @@ export const requestCheckin = async (payload: any) => {
     'checkin.base.vn/ajax/api/me/checkin/mobile',
     _formData,
   );
-
-  console.log('dat', data);
 
   return data.code;
 };

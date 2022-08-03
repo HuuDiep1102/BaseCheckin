@@ -34,17 +34,11 @@ export const checkPermission = async (
 ): Promise<boolean> => {
   // @ts-ignore
   const permissions = REQUEST_PERMISSION_TYPE[type][Platform.OS];
-  console.log('permissions', permissions);
   if (!permissions) {
     return true;
   }
   try {
     const result = await check(permissions);
-    console.log('result', result);
-    // if (result === RESULTS.BLOCKED && isRequest) {
-    //   openSettings().catch(() => console.warn('cannot open settings'));
-    //   return false;
-    // }
     if (result === RESULTS.GRANTED) {
       return true;
     }
@@ -53,7 +47,6 @@ export const checkPermission = async (
     }
     return requestPermission(permissions);
   } catch (error) {
-    console.log(error);
     return false;
   }
 };

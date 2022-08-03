@@ -1,4 +1,4 @@
-import React, { forwardRef, memo } from "react";
+import React, {forwardRef, memo} from 'react';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
@@ -25,8 +25,8 @@ const CameraView = (props: any, ref: any) => {
 
 const styles = StyleSheet.create({
   camera: {
-    height: 200,
-    width: 200,
+    height: '100%',
+    width: '100%',
   },
 });
 

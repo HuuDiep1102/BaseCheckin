@@ -10,7 +10,6 @@ export const requestGetHistory = async (params: any) => {
     formData,
   );
 
-  console.log('history', data);
 
   if (!data) {
     return [];

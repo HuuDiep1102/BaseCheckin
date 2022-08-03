@@ -23,58 +23,58 @@ export const DayComponent = (props: Props) => {
 
   const history: RawHistory = useHistory(date);
 
-  return (
-    <>
-      <Modal
-        style={styles.modal}
-        isVisible={modalVisible}
-        hasBackdrop={true}
-        statusBarTranslucent={true}
-        onBackdropPress={hideModalVisible}
-        onSwipeComplete={hideModalVisible}
-        swipeThreshold={20}
-        swipeDirection="down">
-        <CenteredView>
-          <ModalView>
-            <InputContactContainer>
-              <NoteSelectContainer>
-                <NoteText>
-                  {moment(date).locale('vi').format('dddd')},{' '}
-                  {moment(date).format('L')}
-                </NoteText>
-              </NoteSelectContainer>
-              <ScrollView style={styles.scroll}>
-                {history?.logs.length > 0 &&
-                  history?.logs.map((log, index) => (
-                    <LogTime>
-                      <TitleText key={index}>
-                        {moment.unix(log.time).format('DD/MM')}{' '}
-                        {moment.unix(log.time).format('HH:mm:ss')}
-                      </TitleText>
-                      <DeatailText>
-                        IP: {log.ip} - Văn phòng: True Platform HQ
-                      </DeatailText>
-                    </LogTime>
-                  ))}
-              </ScrollView>
-            </InputContactContainer>
-          </ModalView>
-        </CenteredView>
-      </Modal>
+  const element = <><>
+    <Modal
+      style={styles.modal}
+      isVisible={modalVisible}
+      hasBackdrop={true}
+      statusBarTranslucent={true}
+      onBackdropPress={hideModalVisible}
+      onSwipeComplete={hideModalVisible}
+      swipeThreshold={20}
+      swipeDirection="down">
+      <CenteredView>
+        <ModalView>
+          <InputContactContainer>
+            <NoteSelectContainer>
+              <NoteText>
+                {moment(date).locale('vi').format('dddd')},{' '}
+                {moment(date).format('L')}
+              </NoteText>
+            </NoteSelectContainer>
+            <ScrollView style={styles.scroll}>
+              {history?.logs.length > 0 &&
+                history?.logs.map((log, index) => (
+                  <LogTime>
+                    <TitleText key={index}>
+                      {moment.unix(log.time).format('DD/MM')}{' '}
+                      {moment.unix(log.time).format('HH:mm:ss')}
+                    </TitleText>
+                    <DeatailText>
+                      IP: {log.ip} - Văn phòng: True Platform HQ
+                    </DeatailText>
+                  </LogTime>
+                ))}
+            </ScrollView>
+          </InputContactContainer>
+        </ModalView>
+      </CenteredView>
+    </Modal>
 
-      <DayContainer disabled={!isDayInMonth} onPress={showModalVisible}>
-        <Date color={color}>{moment(date).format('DD/MM').toString()}</Date>
-        {isDayInMonth && history?.logs.length > 0 && (
-          <>
-            {history?.logs.length > 0 &&
-              history?.logs.map((log, index) => (
-                <Time key={index}>{moment.unix(log.time).format('HH:mm')}</Time>
-              ))}
-          </>
-        )}
-      </DayContainer>
-    </>
-  );
+    <DayContainer disabled={!isDayInMonth} onPress={showModalVisible}>
+      <Date color={color}>{moment(date).format('DD/MM').toString()}</Date>
+      {isDayInMonth && history?.logs.length > 0 && (
+        <>
+          {history?.logs.length > 0 &&
+            history?.logs.map((log, index) => (
+              <Time key={index}>{moment.unix(log.time).format('HH:mm')}</Time>
+            ))}
+        </>
+      )}
+    </DayContainer>
+  </>
+  </>;
+  return element;
 };
 
 const NoteSelectContainer = styled.View`

@@ -2,7 +2,14 @@ import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import moment from 'moment';
 import {Colors} from '@/themes/Colors';
-import React, {memo, useCallback, useEffect, useState} from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  Component,
+  PropsWithChildren,
+} from 'react';
 import {DayComponent} from '@/screens/History/components/DayComponent';
 import {RawClient} from '@/types';
 import {useClient} from '@/store/login';
@@ -176,7 +183,6 @@ const styles = StyleSheet.create({
 
   history: {
     backgroundColor: Colors.anti_flashWhite,
-    // marginTop: 8,
   },
 
   scroll: {},

@@ -5,13 +5,13 @@ import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native'; // remove PROVIDER_GOOGLE import if not using Google Maps
 
 const LoadingView = styled.View`
-  width: 100%;
-  height: 150px;
-  margin-bottom: 20px;
+  height: 75%;
+  width: 80%;
   background-color: ${Colors.oldSilver};
 `;
 
 export const Map = (props: MapViewProps) => {
+  // @ts-ignore
   const {initialRegion, children} = props;
 
   if (!initialRegion) {
@@ -34,7 +34,6 @@ const MapContainer = styled.View`
   height: 75%;
   width: 80%;
   justify-content: flex-end;
-  background-color: ${Colors.oldSilver};
 `;
 
 const styles = StyleSheet.create({

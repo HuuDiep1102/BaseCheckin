@@ -12,8 +12,9 @@ import {useAsyncFn} from 'react-use';
 import {useLocation} from '@/hooks/useLocation';
 import {defaultParams} from '@/utils';
 import {requestCheckin} from '@/store/login/functions';
-import {ActivityIndicator, Alert} from 'react-native';
+import {ActivityIndicator, Alert, Platform} from 'react-native';
 import {Marker} from 'react-native-maps';
+import {css} from 'styled-components';
 
 export const CheckInActiveScreen = memo(
   ({selectedClient}: {selectedClient?: MobileClient}) => {
@@ -54,10 +55,11 @@ export const CheckInActiveScreen = memo(
     }, [latitude, longitude]);
 
     const [{loading, error}, submitCheckin] = useAsyncFn(async () => {
-      console.log(31141413);
-      if (!cameraRef?.current || !latitude || !longitude) {
+      if (!cameraRef?.current || !latitude || !longitude || !selectedClient) {
         return null;
       }
+
+      console.log('client', client.client_key);
 
       const photo = await cameraRef?.current.takePhoto({
         flash: 'off',
@@ -69,7 +71,7 @@ export const CheckInActiveScreen = memo(
         client_key: client.client_key,
         lat: latitude,
         lng: longitude,
-        client_id: 240,
+        client_id: selectedClient?.id,
         photo: photo.path,
         ts,
         ...defaultParams,
@@ -80,8 +82,8 @@ export const CheckInActiveScreen = memo(
       Alert.alert(
         '',
         res
-          ? 'Checkin thanh cong'
-          : 'Checkin không thành công vui lòng thử lại',
+          ? 'Checkin thành công'
+          : 'Checkin không thành công, hãy vui lòng thử lại',
         [{text: 'OK'}],
       );
     }, [latitude, longitude, cameraRef]);
@@ -126,7 +128,23 @@ const Container = styled.View`
 const DateTimeContainer = styled.View`
   flex: 1;
   align-items: center;
-  padding-top: 30px;
+  //padding-top: 30px;
+  ${Platform.select({
+    ios: css`
+      padding-top: 30px;
+    `,
+    android: css`
+      padding-top: 10px;
+    `,
+  })};
+  ${Platform.select({
+    ios: css`
+      margin-bottom: 0;
+    `,
+    android: css`
+      margin-bottom: 40px;
+    `,
+  })};
 `;
 
 const Date = styled.Text`
@@ -152,11 +170,18 @@ const MapContainer = styled.View`
 const CameraContainer = styled.View`
   flex: 2;
   margin-left: 10%;
-  margin-top: -45px;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 120px;
   width: 80%;
+  ${Platform.select({
+    ios: css`
+      margin-top: -45px;
+    `,
+    android: css`
+      margin-top: -25px;
+    `,
+  })};
 `;
 
 const ButtonContainer = styled.View`
@@ -164,6 +189,14 @@ const ButtonContainer = styled.View`
   justify-content: flex-start;
   align-items: center;
   margin-top: 10px;
+  ${Platform.select({
+    ios: css`
+      margin-top: 10px;
+    `,
+    android: css`
+      margin-top: 20px;
+    `,
+  })};
 `;
 
 const CheckInButton = styled.TouchableOpacity`
