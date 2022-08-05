@@ -1,20 +1,16 @@
 import React, {memo} from 'react';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
-import moment from 'moment';
 
 interface Props {
   date?: any;
 }
 
-export const HeaderCalendar = memo((props: Props) => {
-  const {date} = props;
+export const HeaderCalendar = ({date}: Props) => {
+  const _date = new Date(date);
 
-  const _date = moment(date);
-
-  const month = (_date.month() + 1).toString();
-
-  const year = _date.year().toString();
+  const month = _date.getMonth() + 1;
+  const year = _date.getFullYear();
 
   return (
     <HeaderContainer>
@@ -24,7 +20,7 @@ export const HeaderCalendar = memo((props: Props) => {
       <DateTextHeader>(Danh sách lịch sử chấm công)</DateTextHeader>
     </HeaderContainer>
   );
-});
+};
 
 const HeaderContainer = styled.View`
   height: 64px;

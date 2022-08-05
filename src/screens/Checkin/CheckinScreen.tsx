@@ -9,20 +9,23 @@ import {checkPermission, PERMISSIONS_TYPE} from '@/utils/permissions';
 import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
 import Modal from 'react-native-modal';
 import {getBottomSpace} from 'react-native-iphone-x-helper';
-import {MobileClient, PayloadPostClientsProps, RawClient} from '@/types';
+import {
+  MobileClient,
+  PayloadPostClientsProps,
+  Permission,
+  RawClient,
+} from '@/types';
 import {useClient, useMobileClients} from '@/store/login';
 import {useAsyncFn} from 'react-use';
-import {defaultParams} from '@/utils';
+import {defaultParams} from '@/utils/formData';
 import {getClients} from '@/store/login/functions';
 
 export const CheckInScreen = memo(() => {
-  const [isPermission, setPermission] = useState();
-
-  const [isClient, setClient] = useState(false);
-
-  const [isCamera, setCamera] = useState(false);
-
-  const [isLocation, setLocation] = useState(false);
+  const [permission, setPermission] = useState<Permission>({
+    checkin: false,
+    camera: false,
+    location: false,
+  });
 
   const [isCheckIn, setCheckIn] = useState(false);
 
@@ -54,14 +57,6 @@ export const CheckInScreen = memo(() => {
 
   const [selectedClient, setSelectedClient] = useState<MobileClient>();
 
-  console.log('client', mobileClients);
-
-  // const [permission, setPermission] = useState({
-  //   checkin: false,
-  //   camera: false,
-  //   location: false,
-  // });
-
   const onBackdrop = useCallback(() => {
     setModalVisible(false);
   }, []);
@@ -73,8 +68,6 @@ export const CheckInScreen = memo(() => {
   const onPermission = useCallback(
     async (type: string, isRequest?: boolean) => {
       const _permission = await checkPermission(type, isRequest);
-
-      type === 'camera' ? setCamera(_permission) : setLocation(_permission);
       setPermission((prev: any) => ({
         ...prev,
         [type]: _permission,
@@ -83,10 +76,25 @@ export const CheckInScreen = memo(() => {
     [],
   );
 
-  const onPickClient = useCallback(() => {
-    setClient(true);
-    setModalVisible(false);
-  }, []);
+  const onRequestCamera = useCallback(async () => {
+    await onPermission(PERMISSIONS_TYPE.camera, true);
+  }, [PERMISSIONS_TYPE.camera]);
+
+  const onRequestLocation = useCallback(async () => {
+    await onPermission(PERMISSIONS_TYPE.location, true);
+  }, [PERMISSIONS_TYPE.location]);
+
+  const onPickClient = useCallback(
+    (item: MobileClient) => {
+      setPermission((prev: any) => ({
+        ...prev,
+        checkin: true,
+      }));
+      setSelectedClient(item);
+      setModalVisible(false);
+    },
+    [setSelectedClient, permission.checkin],
+  );
 
   useEffect(() => {
     (async () => {
@@ -96,8 +104,8 @@ export const CheckInScreen = memo(() => {
   }, []);
 
   useEffect(() => {
-    setCheckIn(isClient && isCamera && isLocation);
-  }, [isClient, isCamera, isLocation]);
+    setCheckIn(permission.checkin && permission.camera && permission.location);
+  }, [permission.checkin, permission.camera, permission.location]);
 
   return (
     <View style={[styles.scene, styles.checkIn]}>
@@ -117,8 +125,10 @@ export const CheckInScreen = memo(() => {
                 {mobileClients.length > 0 &&
                   mobileClients.map((item, index) => {
                     return (
-                      <SelectButton key={index} onPress={onPickClient}>
-                        <TitleText>{item.name}</TitleText>
+                      <SelectButton
+                        key={index}
+                        onPress={() => onPickClient(item)}>
+                        <TitleText numberOfLines={1}>{item.name}</TitleText>
                       </SelectButton>
                     );
                   })}
@@ -133,33 +143,31 @@ export const CheckInScreen = memo(() => {
         <>
           <NoteContainer>
             <TextNote>
-              Để có thể sử dụng tính năng CheckIn bạn vui lòng chọn thao tác
-              Anable/disable
+              {
+                'Để có thể sử dụng tính năng CheckIn bạn vui lòng\nchọn thao tác Anable/disable'
+              }
             </TextNote>
           </NoteContainer>
           <SelectContainer>
             <SelectItem
               title="CheckIn client"
               icon={IC_CHECKIN}
-              clientCheckIn={'Mobile CheckIn'}
+              clientCheckIn={selectedClient}
               onPress={onSelectClient}
-              active={isClient}
+              active={permission.checkin}
             />
             <SelectItem
               title="Camera"
               icon={IC_CAMERA}
-              onPress={async () => {
-                await onPermission(PERMISSIONS_TYPE.camera, true);
-              }}
-              active={isCamera}
+              onPress={onRequestCamera}
+              active={permission.camera}
             />
+
             <SelectItem
               title="Location"
               icon={IC_LOCATION}
-              onPress={async () =>
-                await onPermission(PERMISSIONS_TYPE.location, true)
-              }
-              active={isLocation}
+              onPress={onRequestLocation}
+              active={permission.location}
             />
           </SelectContainer>
         </>

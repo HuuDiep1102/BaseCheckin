@@ -2,14 +2,22 @@ import React, {memo, useCallback, useState} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import {IC_BASE_ME, IC_EMAIL, IC_LOCK, IMG_BANNER} from '@/assets';
+import {replaceWithCheckinScreen} from '@/utils/navigation';
 import {
-  navigateToHomeScreen,
-  replaceWithCheckinScreen,
-} from '@/utils/navigation';
-import {Alert, ActivityIndicator, Platform} from 'react-native';
+  Alert,
+  ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+  View,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import {useAsyncFn} from 'react-use';
 import {requestLogin} from '@/store/login/functions';
-import {CustomTextInput} from '@/components/TextInput';
+import CustomTextInput from '@/components/TextInput';
 import {css} from 'styled-components';
 
 export const LoginScreen = memo(() => {
@@ -44,57 +52,67 @@ export const LoginScreen = memo(() => {
   }, []);
 
   return (
-    <Container>
-      <HeaderConatiner>
-        <LogoApp source={IC_BASE_ME} />
-      </HeaderConatiner>
-      <SectionContainer>
-        <BannerImage resizeMode={'contain'} source={IMG_BANNER} />
-        <LoginInputContainer>
-          <CustomTextInput
-            icon={IC_EMAIL}
-            label={'Email'}
-            keyName={'email'}
-            value={account.email}
-            keyboardType={'email-address'}
-            onChangeValue={onChangeValue}
-          />
-          <CustomTextInput
-            secureTextEntry
-            icon={IC_LOCK}
-            label={'Mật khẩu'}
-            keyName={'password'}
-            value={account.password}
-            onChangeValue={onChangeValue}
-          />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <ScrollView>
+        <View style={{height: Dimensions.get('screen').height}}>
+          <HeaderConatiner>
+            <LogoApp source={IC_BASE_ME} />
+          </HeaderConatiner>
 
-          <ForgotPassWordContainer>
-            <ForgotPassWordText>Quên mật khẩu?</ForgotPassWordText>
-          </ForgotPassWordContainer>
-        </LoginInputContainer>
-        <FooterContainer>
-          <WrapButton>
-            <BtnLogin onPress={onLogin}>
-              <BtnLoginText>ĐĂNG NHẬP</BtnLoginText>
-              {loading && <ActivityIndicator style={{marginLeft: 10}} />}
-            </BtnLogin>
-          </WrapButton>
-        </FooterContainer>
-      </SectionContainer>
-    </Container>
+          <SectionContainer>
+            <BannerImage resizeMode={'stretch'} source={IMG_BANNER} />
+            <LoginInputContainer>
+              <CustomTextInput
+                icon={IC_EMAIL}
+                label={'Email'}
+                keyName={'email'}
+                value={account.email}
+                keyboardType={'email-address'}
+                onChangeValue={onChangeValue}
+              />
+              <CustomTextInput
+                secureTextEntry
+                icon={IC_LOCK}
+                label={'Mật khẩu'}
+                keyName={'password'}
+                value={account.password}
+                onChangeValue={onChangeValue}
+              />
+
+              <ForgotPassWordContainer>
+                <ForgotPassWordText>Quên mật khẩu?</ForgotPassWordText>
+              </ForgotPassWordContainer>
+            </LoginInputContainer>
+            <FooterContainer>
+              <WrapButton>
+                <BtnLogin onPress={onLogin}>
+                  <BtnLoginText>ĐĂNG NHẬP</BtnLoginText>
+                  {loading && <ActivityIndicator style={{marginLeft: 10}} />}
+                </BtnLogin>
+              </WrapButton>
+            </FooterContainer>
+          </SectionContainer>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 });
 const BannerImage = styled.Image`
   position: absolute;
-  height: 456.93px;
+  ${Platform.select({
+    ios: css`
+      height: 456.93px;
+    `,
+    android: css`
+      height: 400px;
+    `,
+  })};
   width: 100%;
   bottom: 0;
   opacity: 0.2;
   z-index: -1;
-`;
-
-const Container = styled.View`
-  flex: 1;
 `;
 
 const SectionContainer = styled.View`
@@ -118,7 +136,7 @@ const LoginInputContainer = styled.View`
       padding-top: 100px;
     `,
     android: css`
-      padding-top: 100px;
+      padding-top: 65px;
     `,
   })};
   flex: 1;
@@ -129,7 +147,14 @@ const LoginInputContainer = styled.View`
 const ForgotPassWordContainer = styled.TouchableOpacity`
   height: 64px;
   width: 150px;
-  padding-right: 10%;
+  ${Platform.select({
+    ios: css`
+      padding-right: 11%;
+    `,
+    android: css`
+      padding-right: 0;
+    `,
+  })};
   align-self: flex-end;
 `;
 const ForgotPassWordText = styled.Text`
@@ -149,7 +174,7 @@ const FooterContainer = styled.View`
 `;
 
 const WrapButton = styled.View`
-  padding-bottom: 30px;
+  padding-bottom: 45px;
 `;
 
 const BtnLogin = styled.TouchableOpacity`
@@ -170,3 +195,15 @@ const BtnLoginText = styled.Text`
   line-height: 20px;
   color: ${Colors.white};
 `;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  inner: {
+    padding: 24,
+    flex: 1,
+    justifyContent: 'space-around',
+  },
+});

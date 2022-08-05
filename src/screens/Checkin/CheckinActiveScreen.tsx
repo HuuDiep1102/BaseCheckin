@@ -10,117 +10,138 @@ import {useClient} from '@/store/login';
 import {Camera} from 'react-native-vision-camera';
 import {useAsyncFn} from 'react-use';
 import {useLocation} from '@/hooks/useLocation';
-import {defaultParams} from '@/utils';
+import {defaultParams} from '@/utils/formData';
 import {requestCheckin} from '@/store/login/functions';
 import {ActivityIndicator, Alert, Platform} from 'react-native';
 import {Marker} from 'react-native-maps';
 import {css} from 'styled-components';
+import {RNCamera} from 'react-native-camera';
 
-export const CheckInActiveScreen = memo(
-  ({selectedClient}: {selectedClient?: MobileClient}) => {
-    const [time, setTime] = useState(moment().format('HH:mm:ss'));
+interface Props {
+  selectedClient?: MobileClient;
+}
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setTime(moment().format('HH:mm:ss'));
-      }, 1000);
+export const CheckInActiveScreen = memo(({selectedClient}: Props) => {
+  const [time, setTime] = useState(moment().format('HH:mm:ss'));
 
-      return () => clearInterval(interval);
-    }, [time]);
+  const weekName = moment().locale('vi').format('dddd');
 
-    const client: RawClient = useClient();
+  const today = moment().format('L');
 
-    const cameraRef = useRef<Camera>(null);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(moment().format('HH:mm:ss'));
+    }, 1000);
 
-    const {latitude, longitude} = useLocation();
+    return () => clearInterval(interval);
+  }, [time]);
 
-    const initialRegion = useMemo(() => {
-      return latitude && longitude
-        ? {
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }
-        : undefined;
-    }, [latitude, longitude]);
+  const client: RawClient = useClient();
 
-    const coordinate = useMemo(() => {
-      return latitude && longitude
-        ? {
-            latitude,
-            longitude,
-          }
-        : undefined;
-    }, [latitude, longitude]);
+  const cameraRef = useRef<any>(null);
 
-    const [{loading}, submitCheckin] = useAsyncFn(async () => {
-      if (!cameraRef?.current || !latitude || !longitude) {
-        return null;
-      }
+  const {latitude, longitude} = useLocation();
 
-      console.log('client', client.client_key);
+  const initialRegion = useMemo(() => {
+    return latitude && longitude
+      ? {
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }
+      : undefined;
+  }, [latitude, longitude]);
 
-      const photo = await cameraRef?.current.takePhoto({
-        flash: 'off',
-      });
+  const coordinate = useMemo(() => {
+    return latitude && longitude
+      ? {
+          latitude,
+          longitude,
+        }
+      : undefined;
+  }, [latitude, longitude]);
 
-      const ts = moment().unix() / 1000;
-      const params = {
-        access_token: client.access_token,
-        client_key: client.client_key,
-        lat: latitude,
-        lng: longitude,
-        client_id: 240,
-        photo: photo.path,
-        ts,
-        ...defaultParams,
-      };
+  const [{loading, error}, submitCheckin] = useAsyncFn(async () => {
+    if (!cameraRef?.current || !latitude || !longitude || !selectedClient) {
+      return null;
+    }
 
-      try {
-        const res = await requestCheckin(params);
-      } catch (e) {
-        console.log('eee ', e);
-      }
+    const photo = await cameraRef?.current.takePhoto({
+      flash: 'off',
+    });
 
-      Alert.alert(
-        '',
-        res
-          ? 'Checkin thành công'
-          : 'Checkin không thành công, hãy vui lòng thử lại',
-        [{text: 'OK'}],
-      );
-    }, [latitude, longitude, cameraRef]);
+    const ts = moment().unix() / 1000;
+    const params = {
+      access_token: client.access_token,
+      client_key: client.client_key,
+      lat: latitude,
+      lng: longitude,
+      client_id: selectedClient.id,
+      photo: photo.path,
+      ts,
+      ...defaultParams,
+    };
 
-    return (
-      <Container>
-        <DateTimeContainer>
-          <Date>
-            {moment().locale('vi').format('dddd')}, {moment().format('L')}
-          </Date>
-          <Time>{time}</Time>
-        </DateTimeContainer>
-        <MapContainer>
-          <Map initialRegion={initialRegion}>
-            {coordinate && <Marker coordinate={coordinate} />}
-          </Map>
-        </MapContainer>
-        <CameraContainer>
-          <CameraView ref={cameraRef} />
-        </CameraContainer>
-        <ButtonContainer>
-          <CheckInButton onPress={submitCheckin}>
-            <CheckInButtonText>CHẤM CÔNG</CheckInButtonText>
-            {loading && <ActivityIndicator />}
-          </CheckInButton>
-          <CheckInClientContainer>
-            <CheckInClientText>CO - Chấm công mobile</CheckInClientText>
-          </CheckInClientContainer>
-        </ButtonContainer>
-      </Container>
+    console.log('params', params);
+    //
+    // try {
+    //   const res = await requestCheckin(params);
+    // } catch (error) {
+    //   console.log('eee ', error);
+    // }
+
+    const res = await requestCheckin(params);
+
+    Alert.alert(
+      '',
+      res
+        ? 'CheckIn thành công'
+        : 'CheckIn không thành công, hãy vui lòng thử lại',
+      [{text: 'OK'}],
     );
-  },
-);
+  }, [latitude, longitude, cameraRef]);
+
+  return (
+    <Container>
+      <DateTimeContainer>
+        <Date>
+          {weekName}, {today}
+        </Date>
+        <Time>{time}</Time>
+      </DateTimeContainer>
+      <Map initialRegion={initialRegion}>
+        {coordinate && <Marker coordinate={coordinate} />}
+      </Map>
+      <CameraView ref={cameraRef} />
+      {/*<RNCamera*/}
+      {/*  ref={cameraRef}*/}
+      {/*  type={RNCamera.Constants.Type.front}*/}
+      {/*  androidCameraPermissionOptions={{*/}
+      {/*    title: 'Permission to use camera',*/}
+      {/*    message: 'We need your permission to use your camera',*/}
+      {/*    buttonPositive: 'Ok',*/}
+      {/*    buttonNegative: 'Cancel',*/}
+      {/*  }}*/}
+      {/*  androidRecordAudioPermissionOptions={{*/}
+      {/*    title: 'Permission to use audio recording',*/}
+      {/*    message: 'We need your permission to use your audio',*/}
+      {/*    buttonPositive: 'Ok',*/}
+      {/*    buttonNegative: 'Cancel',*/}
+      {/*  }}*/}
+      {/*/>*/}
+      <ButtonContainer>
+        <CheckInButton onPress={submitCheckin}>
+          <CheckInButtonText>CHẤM CÔNG</CheckInButtonText>
+          {loading && <ActivityIndicator />}
+        </CheckInButton>
+        <CheckInClientContainer>
+          <CheckInClientText>CO - Chấm công mobile</CheckInClientText>
+        </CheckInClientContainer>
+      </ButtonContainer>
+    </Container>
+  );
+});
 
 const Container = styled.View`
   flex: 1;
@@ -131,7 +152,6 @@ const Container = styled.View`
 const DateTimeContainer = styled.View`
   flex: 1;
   align-items: center;
-  //padding-top: 30px;
   ${Platform.select({
     ios: css`
       padding-top: 30px;
@@ -145,7 +165,7 @@ const DateTimeContainer = styled.View`
       margin-bottom: 0;
     `,
     android: css`
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     `,
   })};
 `;
@@ -162,29 +182,6 @@ const Time = styled.Text`
   color: ${Colors.azure};
   font-weight: 600;
   padding-top: 10px;
-`;
-
-const MapContainer = styled.View`
-  flex: 1;
-  align-items: center;
-  margin-top: -40px;
-`;
-
-const CameraContainer = styled.View`
-  flex: 2;
-  margin-left: 10%;
-  justify-content: center;
-  align-items: center;
-  height: 120px;
-  width: 80%;
-  ${Platform.select({
-    ios: css`
-      margin-top: -45px;
-    `,
-    android: css`
-      margin-top: -25px;
-    `,
-  })};
 `;
 
 const ButtonContainer = styled.View`
@@ -211,6 +208,7 @@ const CheckInButton = styled.TouchableOpacity`
   border-color: ${Colors.green2};
   border-width: 0.5px;
   margin-bottom: 15px;
+  flex-direction: row;
 `;
 
 const CheckInButtonText = styled.Text`

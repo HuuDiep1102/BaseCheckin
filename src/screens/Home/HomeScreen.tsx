@@ -8,7 +8,7 @@ import {HeaderComponent} from '@/components/HeaderComponent';
 import {CheckInScreen} from '@/screens/CheckIn/CheckInScreen';
 
 import {HistoryScreen} from '@/screens/History/HistoryScreen';
-import {memo} from 'react';
+import {memo, useCallback, useState} from 'react';
 
 const initialLayout = {width: Dimensions.get('window').width};
 
@@ -17,28 +17,28 @@ const renderScene = SceneMap({
   second: HistoryScreen,
 });
 
-const renderTabBar = (props: any) => {
-  return (
-    <TabBar
-      {...props}
-      indicatorStyle={styles.indicatorStyle}
-      style={styles.tabBar}
-      renderLabel={({route, focused}) => (
-        <LabelText focused={focused}>{route.title}</LabelText>
-      )}
-    />
-  );
-};
-
 export const HomeScreen = memo(() => {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    {key: 'first', title: 'Checkin'},
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    {key: 'first', title: 'CheckIn'},
     {key: 'second', title: 'Lịch sử'},
   ]);
 
+  const renderTabBar = useCallback((props: any) => {
+    return (
+      <TabBar
+        {...props}
+        indicatorStyle={styles.indicatorStyle}
+        style={styles.tabBar}
+        renderLabel={({route, focused}) => (
+          <LabelText focused={focused}>{route.title}</LabelText>
+        )}
+      />
+    );
+  }, []);
+
   return (
-    <>
+    <Container>
       <HeaderComponent title="Checkin" />
       <TabView
         navigationState={{index, routes}}
@@ -48,7 +48,7 @@ export const HomeScreen = memo(() => {
         style={styles.container}
         renderTabBar={renderTabBar}
       />
-    </>
+    </Container>
   );
 });
 
@@ -60,6 +60,10 @@ const LabelText = styled.Text<{
   font-size: 15px;
   font-weight: 500;
   line-height: 18px;
+`;
+
+const Container = styled.View`
+  flex: 1;
 `;
 
 const styles = StyleSheet.create({

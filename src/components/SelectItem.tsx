@@ -2,11 +2,12 @@ import React, {memo} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import 'react-native-gesture-handler';
+import {MobileClient} from '@/types';
 
 interface SelectItemProps {
   title: string;
   icon: any;
-  clientCheckIn?: string;
+  clientCheckIn?: MobileClient;
   onPress: () => void;
   active: boolean | undefined;
 }
@@ -19,7 +20,9 @@ export const SelectItem = memo((props: SelectItemProps) => {
         <Icon source={icon} />
         <TextContainer>
           <TitleText>{title}</TitleText>
-          {clientCheckIn && <DevicesText>{clientCheckIn}</DevicesText>}
+          {clientCheckIn && (
+            <DevicesText numberOfLines={1}>{clientCheckIn.name}</DevicesText>
+          )}
         </TextContainer>
         <ActiveText isActive={active}>
           {active ? 'Enable' : 'Disable'}
@@ -50,6 +53,7 @@ const TextContainer = styled.View`
   justify-content: center;
   align-items: flex-start;
   padding-left: 16px;
+  width: 70%;
 `;
 
 const TitleText = styled.Text`

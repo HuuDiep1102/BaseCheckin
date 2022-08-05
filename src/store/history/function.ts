@@ -1,34 +1,15 @@
 import {Fetch} from '@/utils/fetch';
 import {syncAllHistory} from '@/store/history/index';
-import {newFormData} from '@/utils';
-import axios from 'axios';
+import {newFormData} from '@/utils/formData';
 
 export const requestGetHistory = async (params: any) => {
-  // const formData = newFormData(params);
-  const formData = new FormData();
-  console.log('params', params);
+  const formData = newFormData(params);
 
-  Object.keys(params).forEach(key => {
-    if (key.includes('photo')) {
-      formData.append(key, {
-        uri: params[key],
-        type: 'image/jpg',
-        name: 'checkin.jpg',
-      });
-    } else {
-      formData.append(key, params[key]);
-    }
-  });
-
-  const {data} = await axios.post(
-    'https://checkin.base.vn/ajax/api/me/logs?',
-    JSON.stringify(params),
-    {
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    },
+  const {data} = await Fetch.post(
+    `checkin.base.vn/ajax/api/me/logs?time_start=${params.time_start}&time_end=${params.time_end}`,
+    formData,
   );
 
-  console.log('data', data);
   if (!data) {
     return [];
   }

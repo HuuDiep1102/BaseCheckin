@@ -4,7 +4,7 @@ import {default as useToggle} from 'react-use/lib/useToggle';
 /**
  * Return array of [value, setTrue, setFalse], you can call setTrue and setFalse without setup useCallback
  */
-export const useBoolean = (
+const useBoolean = (
   initialValue: boolean = false,
 ): [boolean, () => void, () => void] => {
   const [value, toggle] = useToggle(initialValue);
@@ -19,3 +19,5 @@ export const useBoolean = (
 
   return [value, setTrue, setFalse];
 };
+
+export default useBoolean;

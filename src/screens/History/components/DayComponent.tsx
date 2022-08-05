@@ -1,32 +1,45 @@
-import React, {memo, useEffect, useMemo} from 'react';
+import React, {memo, useCallback, useMemo} from 'react';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
-import {ScrollView, StyleSheet, TextInputProps} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet, TextInputProps} from 'react-native';
 import Modal from 'react-native-modal';
 import moment from 'moment';
 import {getBottomSpace} from 'react-native-iphone-x-helper';
+import 'moment/locale/vi'; // ko co dong nay locale ko chay
 import {useHistory} from '@/store/history';
-import {useBoolean} from '@/hooks/useBoolean';
+import useBoolean from '@/hooks/useBoolean';
 import {RawHistory} from '@/types';
-import {toString} from 'lodash';
 
 interface Props extends TextInputProps {
-  date: any;
+  date?: string;
   isDayInMonth: boolean;
+  isToday: boolean;
 }
 
-export const DayComponent = memo((props: Props) => {
-  const {date, isDayInMonth} = props;
+export const DayComponent = memo(({date, isDayInMonth, isToday}: Props) => {
+  const weekName = moment(date).locale('vi').format('dddd');
+
+  const today = moment(date).format('L');
+
+  const dateTitle = moment(date).format('DD/MM').toString();
 
   const [modalVisible, showModalVisible, hideModalVisible] = useBoolean(false); //Khong can viet thanh ham nua
 
-  const color = isDayInMonth ? Colors.oldSilver : Colors.gray;
-
   const history: RawHistory = useHistory(date);
 
-  console.log('hisorting', history?.logs);
+  const color = useMemo(() => {
+    return isDayInMonth
+      ? isToday
+        ? Colors.azure
+        : Colors.oldSilver
+      : Colors.gray;
+  }, [isDayInMonth, isToday]);
 
-  const dateTitle = moment(date).format('DD/MM').toString();
+  const onOpenModal = useCallback(() => {
+    if (history?.logs.length > 0) {
+      showModalVisible();
+    }
+  }, [history?.logs.length, showModalVisible]);
 
   return (
     <>
@@ -44,37 +57,43 @@ export const DayComponent = memo((props: Props) => {
             <InputContactContainer>
               <NoteSelectContainer>
                 <NoteText>
-                  {moment(date).locale('vi').format('dddd')},{' '}
-                  {moment(date).format('L')}
+                  {weekName} {today}
                 </NoteText>
               </NoteSelectContainer>
-              <ScrollView style={styles.scroll}>
+              <ScrollView>
                 {history?.logs.length > 0 &&
-                  history?.logs.map((log, index) => (
-                    <LogTime>
-                      <TitleText key={index}>
-                        {moment.unix(log.time).format('DD/MM')}{' '}
-                        {moment.unix(log.time).format('HH:mm:ss')}
-                      </TitleText>
-                      <DeatailText>
-                        IP: {log.ip} - Văn phòng: True Platform HQ
-                      </DeatailText>
-                    </LogTime>
-                  ))}
+                  history?.logs.map((log, index) => {
+                    return (
+                      <LogTime>
+                        <TitleText key={index}>
+                          {moment.unix(log.time).format('DD/MM')}{' '}
+                          {moment.unix(log.time).format('HH:mm:ss')}
+                        </TitleText>
+                        <DeatailText>
+                          IP: {log.ip} - Văn phòng: True Platform HQ
+                        </DeatailText>
+                      </LogTime>
+                    );
+                  })}
               </ScrollView>
             </InputContactContainer>
           </ModalView>
         </CenteredView>
       </Modal>
 
-      <DayContainer disabled={!isDayInMonth} onPress={showModalVisible}>
+      <DayContainer disabled={!isDayInMonth} onPress={onOpenModal}>
         <Date color={color}>{dateTitle}</Date>
         {isDayInMonth && history?.logs.length > 0 && (
           <>
             {history?.logs.length > 0 &&
-              history?.logs.map((log, index) => (
-                <Time key={index}>{moment.unix(log.time).format('HH:mm')}</Time>
-              ))}
+              history?.logs.map((log, index) => {
+                if (index === 0 || index === history?.logs?.length - 1)
+                  return (
+                    <Time key={index}>
+                      {moment.unix(log.time).format('HH:mm')}
+                    </Time>
+                  );
+              })}
           </>
         )}
       </DayContainer>
@@ -132,6 +151,7 @@ const InputContactContainer = styled.View`
   background-color: ${Colors.white};
   border-radius: 15px;
   padding: 5px;
+  max-height: ${Dimensions.get('window').height * 0.5}px;
 `;
 
 const LogTime = styled.View`
@@ -168,10 +188,6 @@ const Time = styled.Text`
 `;
 
 const styles = StyleSheet.create({
-  scroll: {
-    height: 130,
-  },
-
   modal: {
     justifyContent: 'flex-end',
     margin: 0,

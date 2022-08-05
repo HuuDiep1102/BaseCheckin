@@ -7,7 +7,7 @@ import {DayComponent} from '@/screens/History/components/DayComponent';
 import {RawClient} from '@/types';
 import {useClient} from '@/store/login';
 import {useAsyncFn} from 'react-use';
-import {defaultParams} from '@/utils';
+import {defaultParams} from '@/utils/formData';
 import {requestGetHistory} from '@/store/history/function';
 import {HeaderCalendar} from '@/screens/History/components/HeaderCalendar';
 import {DayProps} from 'react-native-calendars/src/calendar/day';
@@ -83,15 +83,16 @@ export const HistoryScreen = memo(() => {
     if (!client.access_token || !client.client_key) {
       return null;
     }
-    const time_start = moment(selectedDate).startOf('month').valueOf();
-    const time_end = moment(selectedDate).endOf('month').valueOf();
+    const time_start = moment(selectedDate).startOf('month').valueOf() / 1000;
+
+    const time_end = moment(selectedDate).endOf('month').valueOf() / 1000;
 
     const payload = {
       access_token: client.access_token,
       client_key: client.client_key,
-      time_start,
-      time_end,
-      client_id: 240,
+      time_start: time_start,
+      time_end: time_end,
+      client_id: 658,
       ...defaultParams,
     };
     await requestGetHistory(payload);
@@ -101,24 +102,9 @@ export const HistoryScreen = memo(() => {
     getHistory().then();
   }, [selectedDate]);
 
-  const onPressArrowRight = useCallback((addMonth: () => void) => {
-    addMonth();
-    setSelectedMonth(prev => prev + 1);
-  }, []);
-
-  const onPressArrowLeft = useCallback((subtractMonth: () => void) => {
-    subtractMonth();
-    setSelectedMonth(prev => prev - 1);
-  }, []);
-
-  const onMonthChange = useCallback((date: DateData) => {
-    console.log(date.dateString);
-    setSelectedDate(date.dateString);
-  }, []);
-
   const renderHeader = useCallback(
     (date?: any) => {
-      return <HeaderCalendar date={selectedDate} />;
+      return <HeaderCalendar date={date} />;
     },
     [loading],
   );
@@ -139,10 +125,32 @@ export const HistoryScreen = memo(() => {
 
       const isDayInMonth = selectedMonth === date?.date?.month;
 
-      return <DayComponent date={dateString} isDayInMonth={isDayInMonth} />;
+      const isToday = dateString === moment().format('YYYY-MM-DD');
+
+      return (
+        <DayComponent
+          isToday={isToday}
+          date={dateString}
+          isDayInMonth={isDayInMonth}
+        />
+      );
     },
     [selectedMonth],
   );
+
+  const onPressArrowRight = useCallback((addMonth: () => void) => {
+    addMonth();
+    setSelectedMonth(prev => prev + 1);
+  }, []);
+
+  const onPressArrowLeft = useCallback((subtractMonth: () => void) => {
+    subtractMonth();
+    setSelectedMonth(prev => prev - 1);
+  }, []);
+
+  const onMonthChange = useCallback((date: DateData) => {
+    setSelectedDate(date.dateString);
+  }, []);
 
   return (
     <View style={[styles.scene, styles.history]}>
@@ -158,8 +166,8 @@ export const HistoryScreen = memo(() => {
           onMonthChange={onMonthChange}
           disableMonthChange={true}
           firstDay={1}
-          onPressArrowLeft={onPressArrowRight}
-          onPressArrowRight={onPressArrowLeft}
+          onPressArrowLeft={onPressArrowLeft}
+          onPressArrowRight={onPressArrowRight}
           renderHeader={renderHeader}
           dayComponent={renderDayComponent}
           theme={themes}
@@ -180,7 +188,12 @@ const styles = StyleSheet.create({
   },
 
   history: {
-    backgroundColor: Colors.anti_flashWhite,
+    backgroundColor: Colors.white,
+  },
+
+  scene: {
+    flex: 1,
+    backgroundColor: Colors.black,
   },
 
   scroll: {},

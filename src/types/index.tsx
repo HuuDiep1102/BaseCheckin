@@ -43,6 +43,12 @@ export interface MobileClient {
   radius: string;
 }
 
+export interface Permission {
+  checkin: boolean;
+  camera: boolean;
+  location: boolean;
+}
+
 export interface RawHistory {
   id: string;
   user_id: string;

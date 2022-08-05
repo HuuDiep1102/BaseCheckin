@@ -1,5 +1,5 @@
 import {Fetch} from '@/utils/fetch';
-import {newFormData} from '@/utils';
+import {newFormData} from '@/utils/formData';
 import {PayloadPostClientsProps} from '@/types';
 import {syncAllMobileClient} from '@/store/checkInClient';
 

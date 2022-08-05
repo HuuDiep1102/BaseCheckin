@@ -2,7 +2,7 @@ import React, {memo} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import {IC_BASE_ME} from '@/assets';
-import {navigateToMainNavigation} from '@/utils/navigation';
+import { navigateToMainNavigation, navigateToPreloadScreen } from "@/utils/navigation";
 
 export const WelcomeScreen = memo(() => {
   return (
@@ -19,7 +19,7 @@ export const WelcomeScreen = memo(() => {
       <FooterContainer>
         <WarningText>Bạn chưa đăng nhập</WarningText>
         <WrapButton>
-          <BtnLogin onPress={navigateToMainNavigation}>
+          <BtnLogin onPress={navigateToPreloadScreen}>
             <BtnLoginText>ĐĂNG NHẬP THỦ CÔNG</BtnLoginText>
           </BtnLogin>
         </WrapButton>

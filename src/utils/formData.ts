@@ -4,16 +4,15 @@ export const newFormData = (payload: {[key: string]: any}) => {
   Object.keys(payload).forEach(key => {
     if (key.includes('photo')) {
       _formData.append(key, {
-        uri: payload[key],
+        uri: 'file://' + payload[key],
         type: 'image/jpg',
         name: 'checkin.jpg',
       });
     } else {
-      console.log(key, payload[key]);
       _formData.append(key, payload[key]);
     }
   });
-  console.log('kijfklwe', _formData);
+
   return _formData;
 };
 

@@ -21,7 +21,7 @@ const Logo = styled.Image`
   height: 160px;
 `;
 
-export const PreloadScreen = memo(() => {
+export const PreloadScreen = memo(function PreloadScreen() {
   const client: RawClient = useClient();
 
   useEffect(() => {

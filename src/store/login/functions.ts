@@ -1,7 +1,7 @@
 import {Fetch} from '@/utils/fetch';
 import {setClientAction, setMobileClientsAction} from '@/store/login/index';
 import {PayloadPostClientsProps} from '@/types';
-import {newFormData} from '@/utils';
+import {newFormData} from '@/utils/formData';
 
 export const requestSecret = async () => {
   const {data} = await Fetch.get('api.base.vn/extapi/oauth/client');
@@ -83,7 +83,8 @@ export const getClients = async (payload: PayloadPostClientsProps) => {
 
 export const requestCheckin = async (payload: any) => {
   const _formData = newFormData(payload);
-  console.log(_formData);
+
+  console.log('_formData', _formData);
 
   const {data} = await Fetch.post(
     'checkin.base.vn/ajax/api/me/checkin/mobile',

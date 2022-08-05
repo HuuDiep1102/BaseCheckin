@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 import Geolocation from '@react-native-community/geolocation';
 
 export const useLocation = () => {
@@ -46,6 +46,7 @@ export const useLocation = () => {
       },
     );
   }, []);
+
   useEffect(() => {
     getOneTimeLocation();
     subscribeLocationLocation();

@@ -10,6 +10,8 @@ import {LoginScreen} from '@/screens/Login/LoginScreen';
 
 import {HomeScreen} from '@/screens/Home/HomeScreen';
 
+import {PreloadScreen} from '@/screens/PreloadScreen';
+
 import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
 
 // import {DetailScreenProps, CreateScreenProps} from '@/types';
@@ -39,7 +41,7 @@ export const openDrawer = () =>
 
 export const replaceWithCheckinScreen = createReplace('HomeScreen');
 
-export const navigateToLoginScreen = createNavigate('LoginScreen');
+export const navigateToPreloadScreen = createNavigate('PreloadScreen');
 
 export const replaceWithLoginScreen = createReplace('LoginScreen');
 
