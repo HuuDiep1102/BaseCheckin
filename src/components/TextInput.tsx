@@ -3,6 +3,36 @@ import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
 import {ImageSourcePropType, TextInputProps} from 'react-native';
 
+interface Props extends TextInputProps {
+  icon: ImageSourcePropType;
+  label: string;
+  onChangeValue: (keyName: string, value: string) => void;
+  keyName: string;
+}
+
+export const CustomTextInput = memo((props: Props) => {
+  const {icon, label, onChangeValue, keyName} = props;
+
+  const onChange = useCallback(
+    (text: string) => {
+      onChangeValue(keyName, text);
+    },
+    [keyName, onChangeValue],
+  );
+
+  return (
+    <TextInputContainer>
+      <Icon source={icon} resizeMode={'stretch'} />
+      <TextInput
+        placeholder={label}
+        placeholderTextColor={Colors.oldSilver}
+        onChangeText={onChange}
+        {...props}
+      />
+    </TextInputContainer>
+  );
+});
+
 const TextInputContainer = styled.View`
   flex-direction: row;
   height: 44px;
@@ -27,35 +57,3 @@ const TextInput = styled.TextInput`
   height: 44px;
   color: ${Colors.black};
 `;
-
-interface Props extends TextInputProps {
-  icon: ImageSourcePropType;
-  label: string;
-  onChangeValue: (keyName: string, value: string) => void;
-  keyName: string;
-}
-
-const CustomTextInput = (props: Props) => {
-  const {icon, label, onChangeValue, keyName} = props;
-
-  const onChange = useCallback(
-    (text: string) => {
-      onChangeValue(keyName, text);
-    },
-    [keyName, onChangeValue],
-  );
-
-  return (
-    <TextInputContainer>
-      <Icon source={icon} resizeMode={'stretch'} />
-      <TextInput
-        placeholder={label}
-        placeholderTextColor={Colors.oldSilver}
-        onChangeText={onChange}
-        {...props}
-      />
-    </TextInputContainer>
-  );
-};
-
-export default memo(CustomTextInput);

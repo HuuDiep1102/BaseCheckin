@@ -84,8 +84,6 @@ export const getClients = async (payload: PayloadPostClientsProps) => {
 export const requestCheckin = async (payload: any) => {
   const _formData = newFormData(payload);
 
-  console.log('_formData', _formData);
-
   const {data} = await Fetch.post(
     'checkin.base.vn/ajax/api/me/checkin/mobile',
     _formData,

@@ -12,7 +12,7 @@ const LoadingView = styled.View`
   margin-bottom: 8px;
 `;
 
-export const Map = (props: MapViewProps) => {
+export const Maps = (props: MapViewProps) => {
   const {initialRegion, children} = props;
 
   if (!initialRegion) {

@@ -12,7 +12,7 @@ import {HomeScreen} from '@/screens/Home/HomeScreen';
 
 import {PreloadScreen} from '@/screens/PreloadScreen';
 
-import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
+import {CheckInScreen} from '@/screens/CheckIn/CheckInScreen';
 
 // import {DetailScreenProps, CreateScreenProps} from '@/types';
 
@@ -34,21 +34,21 @@ export const createReplace =
     return navigation().dispatch(StackActions.replace(screenName, params));
   };
 
-export const goBack = () => navigation().goBack();
+export const reset = () =>
+  navigation().reset({
+    index: 0,
+    routes: [
+      {
+        name: 'PreloadScreen',
+      },
+    ],
+  });
 
 export const openDrawer = () =>
   navigation().dispatch(DrawerActions.openDrawer());
 
-export const replaceWithCheckinScreen = createReplace('HomeScreen');
+export const replaceWithMainScreen = createReplace('Draw');
 
-export const navigateToPreloadScreen = createNavigate('PreloadScreen');
+export const navigateToLoginScreen = createNavigate('LoginScreen');
 
-export const replaceWithLoginScreen = createReplace('LoginScreen');
-
-export const navigateToHomeScreen = createNavigate('HomeScreen');
-
-export const navigateToCheckInActiveScreen = createNavigate(
-  'CheckInActiveScreen',
-);
-
-export const navigateToMainNavigation = createNavigate('MainNavigation');
+export const replaceWithWelcomeScreen = createReplace('WelcomeScreen');

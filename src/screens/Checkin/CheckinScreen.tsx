@@ -1,196 +1,276 @@
-import {StyleSheet, View, ScrollView} from 'react-native';
-import {SelectItem} from '@/components/SelectItem';
-import {IC_CAMERA, IC_CHECKIN, IC_LOCATION} from '@/assets';
-import * as React from 'react';
+import React, {memo, useCallback, useMemo, useRef} from 'react';
 import styled from 'styled-components/native';
+import {Maps} from '@/screens/CheckIn/components/Map';
 import {Colors} from '@/themes/Colors';
-import {memo, useCallback, useEffect, useState} from 'react';
-import {checkPermission, PERMISSIONS_TYPE} from '@/utils/permissions';
-import {CheckInActiveScreen} from '@/screens/CheckIn/CheckInActiveScreen';
-import Modal from 'react-native-modal';
-import {getBottomSpace} from 'react-native-iphone-x-helper';
-import {
-  MobileClient,
-  PayloadPostClientsProps,
-  Permission,
-  RawClient,
-} from '@/types';
+import moment from 'moment';
+import 'moment/locale/vi'; // ko co dong nay locale ko chay
+import CameraView from '@/screens/CheckIn/components/Camera';
+import {MobileClient, RawClient} from '@/types';
 import {useClient, useMobileClients} from '@/store/login';
 import {useAsyncFn} from 'react-use';
+import {useLocation} from '@/hooks/useLocation';
 import {defaultParams} from '@/utils/formData';
-import {getClients} from '@/store/login/functions';
+import {requestCheckin} from '@/store/login/functions';
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
+import {Marker} from 'react-native-maps';
+import {css} from 'styled-components';
+import {Timer} from '@/screens/CheckIn/components/Timer';
+import Modal from 'react-native-modal';
+import {getBottomSpace} from 'react-native-iphone-x-helper';
+import useBoolean from '@/hooks/useBoolean';
 
-export const CheckInScreen = memo(() => {
-  const [permission, setPermission] = useState<Permission>({
-    checkin: false,
-    camera: false,
-    location: false,
-  });
+interface Props {
+  selectedClient?: MobileClient;
+  setSelectedClient: Function;
+  index?: number;
+}
 
-  const [isCheckIn, setCheckIn] = useState(false);
+export const CheckInScreen = memo(
+  ({selectedClient, setSelectedClient, index}: Props) => {
+    const [modalVisible, showModalVisible, hideModalVisible] =
+      useBoolean(false);
 
-  const [modalVisible, setModalVisible] = useState(false);
+    const weekName = useMemo(() => {
+      return moment().locale('vi').format('dddd');
+    }, []);
 
-  const client: RawClient = useClient();
+    const today = useMemo(() => {
+      return moment().format('L');
+    }, []);
 
-  const [{}, getMobileClients] = useAsyncFn(async () => {
-    if (!client.access_token || !client.client_key) {
-      return null;
-    }
+    const onBackdrop = useCallback(() => {
+      hideModalVisible();
+    }, []);
 
-    const payload: PayloadPostClientsProps = {
-      lat: 112,
-      lng: 111,
-      access_token: client.access_token,
-      client_key: client.client_key,
-      ...defaultParams,
-    };
+    const onSelectClient = useCallback(() => {
+      showModalVisible();
+    }, []);
 
-    await getClients(payload);
-  }, [client]);
+    const client: RawClient = useClient();
 
-  useEffect(() => {
-    getMobileClients().then();
-  }, []);
+    const cameraRef = useRef<any>(null);
 
-  const mobileClients: MobileClient[] = useMobileClients();
+    const {latitude, longitude} = useLocation();
 
-  const [selectedClient, setSelectedClient] = useState<MobileClient>();
+    const initialRegion = useMemo(() => {
+      return latitude && longitude
+        ? {
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }
+        : undefined;
+    }, [latitude, longitude]);
 
-  const onBackdrop = useCallback(() => {
-    setModalVisible(false);
-  }, []);
+    const coordinate = useMemo(() => {
+      return latitude && longitude
+        ? {
+            latitude,
+            longitude,
+          }
+        : undefined;
+    }, [latitude, longitude]);
 
-  const onSelectClient = useCallback(() => {
-    setModalVisible(true);
-  }, []);
+    const [{loading}, submitCheckin] = useAsyncFn(async () => {
+      console.log('áda');
+      if (!cameraRef?.current || !latitude || !longitude || !selectedClient) {
+        console.log('anull');
+        console.log('cameraRef?.current ', cameraRef?.current);
+        console.log('latitude ', latitude);
+        console.log('longitude ', longitude);
+        console.log('cselectedClient ', selectedClient);
+        return null;
+      }
 
-  const onPermission = useCallback(
-    async (type: string, isRequest?: boolean) => {
-      const _permission = await checkPermission(type, isRequest);
-      setPermission((prev: any) => ({
-        ...prev,
-        [type]: _permission,
-      }));
-    },
-    [],
-  );
+      const photo = await cameraRef?.current.takePhoto({
+        flash: 'off',
+      });
 
-  const onRequestCamera = useCallback(async () => {
-    await onPermission(PERMISSIONS_TYPE.camera, true);
-  }, [PERMISSIONS_TYPE.camera]);
+      const ts = moment().unix() / 1000;
+      const params = {
+        access_token: client.access_token,
+        client_key: client.client_key,
+        lat: latitude,
+        lng: longitude,
+        client_id: selectedClient.id,
+        photo: photo.path,
+        ts,
+        ...defaultParams,
+      };
 
-  const onRequestLocation = useCallback(async () => {
-    await onPermission(PERMISSIONS_TYPE.location, true);
-  }, [PERMISSIONS_TYPE.location]);
+      console.log('params', params);
 
-  const onPickClient = useCallback(
-    (item: MobileClient) => {
-      setPermission((prev: any) => ({
-        ...prev,
-        checkin: true,
-      }));
-      setSelectedClient(item);
-      setModalVisible(false);
-    },
-    [setSelectedClient, permission.checkin],
-  );
+      // try {
+      //   const res = await requestCheckin(params);
+      // } catch (error) {
+      //   console.log('eee ', error);
+      // }
 
-  useEffect(() => {
-    (async () => {
-      await onPermission(PERMISSIONS_TYPE.camera);
-      await onPermission(PERMISSIONS_TYPE.location);
-    })();
-  }, []);
+      const res = await requestCheckin(params);
 
-  useEffect(() => {
-    setCheckIn(permission.checkin && permission.camera && permission.location);
-  }, [permission.checkin, permission.camera, permission.location]);
+      Alert.alert(
+        '',
+        res
+          ? 'CheckIn thành công'
+          : 'CheckIn không thành công, hãy vui lòng thử lại',
+        [{text: 'OK'}],
+      );
+    });
 
-  return (
-    <View style={[styles.scene, styles.checkIn]}>
-      <Modal
-        style={styles.modal}
-        isVisible={modalVisible}
-        hasBackdrop={true}
-        statusBarTranslucent={true}
-        onBackdropPress={onBackdrop}>
-        <CenteredView>
-          <ModalView>
-            <InputContactContainer>
-              <NoteSelectContainer>
-                <NoteText>Select CheckIn client</NoteText>
-              </NoteSelectContainer>
-              <ScrollView>
-                {mobileClients.length > 0 &&
-                  mobileClients.map((item, index) => {
-                    return (
-                      <SelectButton
-                        key={index}
-                        onPress={() => onPickClient(item)}>
-                        <TitleText numberOfLines={1}>{item.name}</TitleText>
-                      </SelectButton>
-                    );
-                  })}
-              </ScrollView>
-            </InputContactContainer>
-          </ModalView>
-        </CenteredView>
-      </Modal>
-      {isCheckIn ? (
-        <CheckInActiveScreen selectedClient={selectedClient} />
-      ) : (
-        <>
-          <NoteContainer>
-            <TextNote>
-              {
-                'Để có thể sử dụng tính năng CheckIn bạn vui lòng\nchọn thao tác Anable/disable'
-              }
-            </TextNote>
-          </NoteContainer>
-          <SelectContainer>
-            <SelectItem
-              title="CheckIn client"
-              icon={IC_CHECKIN}
-              clientCheckIn={selectedClient}
-              onPress={onSelectClient}
-              active={permission.checkin}
-            />
-            <SelectItem
-              title="Camera"
-              icon={IC_CAMERA}
-              onPress={onRequestCamera}
-              active={permission.camera}
-            />
+    const mobileClients: MobileClient[] = useMobileClients();
 
-            <SelectItem
-              title="Location"
-              icon={IC_LOCATION}
-              onPress={onRequestLocation}
-              active={permission.location}
-            />
-          </SelectContainer>
-        </>
-      )}
-    </View>
-  );
-});
+    const onPickClient = useCallback(
+      (item: MobileClient) => {
+        setSelectedClient(item);
+        hideModalVisible();
+      },
+      [setSelectedClient],
+    );
 
-const NoteContainer = styled.View`
-  height: 64px;
-  justify-content: center;
-`;
+    return (
+      <Container>
+        <Modal
+          style={styles.modal}
+          isVisible={modalVisible}
+          hasBackdrop={true}
+          statusBarTranslucent={true}
+          onBackdropPress={onBackdrop}>
+          <CenteredView>
+            <ModalView>
+              <InputContactContainer>
+                <NoteSelectContainer>
+                  <NoteText>Select CheckIn client</NoteText>
+                </NoteSelectContainer>
+                <ScrollView>
+                  {mobileClients.length > 0 &&
+                    mobileClients.map((item, index) => {
+                      return (
+                        <SelectButton
+                          key={index}
+                          onPress={() => onPickClient(item)}>
+                          <TitleText numberOfLines={1}>{item.name}</TitleText>
+                        </SelectButton>
+                      );
+                    })}
+                </ScrollView>
+              </InputContactContainer>
+            </ModalView>
+          </CenteredView>
+        </Modal>
 
-const TextNote = styled.Text`
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 18px;
-  padding-left: 16px;
-  color: ${Colors.oldSilver};
-`;
+        <DateTimeContainer>
+          <Date>
+            {weekName}, {today}
+          </Date>
+          <Timer />
+        </DateTimeContainer>
+        <Maps initialRegion={initialRegion}>
+          {coordinate && <Marker coordinate={coordinate} />}
+        </Maps>
+        {index === 0 && <CameraView ref={cameraRef} />}
+        <ButtonContainer>
+          <CheckInButton disabled={loading} onPress={submitCheckin}>
+            <CheckInButtonText>CHẤM CÔNG</CheckInButtonText>
+            {loading && <ActivityIndicator color={'#0077cc'} />}
+          </CheckInButton>
+          <CheckInClientContainer onPress={onSelectClient}>
+            <CheckInClientText numberOfLines={1}>
+              {selectedClient?.name}
+            </CheckInClientText>
+          </CheckInClientContainer>
+        </ButtonContainer>
+      </Container>
+    );
+  },
+);
 
-const SelectContainer = styled.View`
+const Container = styled.View`
   flex: 1;
+  background-color: ${Colors.white};
+  margin-top: 8px;
+`;
+
+const DateTimeContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  ${Platform.select({
+    ios: css`
+      padding-top: 30px;
+    `,
+    android: css`
+      padding-top: 10px;
+    `,
+  })};
+  ${Platform.select({
+    ios: css`
+      margin-bottom: 0;
+    `,
+    android: css`
+      margin-bottom: 20px;
+    `,
+  })};
+`;
+
+const Date = styled.Text`
+  font-size: 25px;
+  font-weight: 500;
+  text-transform: capitalize;
+  color: ${Colors.black};
+`;
+
+const ButtonContainer = styled.View`
+  flex: 1;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  ${Platform.select({
+    ios: css`
+      margin-top: 10px;
+    `,
+    android: css`
+      margin-top: 20px;
+    `,
+  })};
+`;
+
+const CheckInButton = styled.TouchableOpacity`
+  height: 55px;
+  width: 76%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  border-color: ${Colors.green2};
+  border-width: 0.5px;
+  margin-bottom: 15px;
+  flex-direction: row;
+`;
+
+const CheckInButtonText = styled.Text`
+  font-size: 20px;
+  color: ${Colors.green2};
+  font-weight: 500;
+`;
+
+const CheckInClientContainer = styled.TouchableOpacity`
+  height: 30px;
+  width: 44%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: antiquewhite;
+`;
+
+const CheckInClientText = styled.Text`
+  font-size: 13px;
+  color: ${Colors.green2};
+  font-weight: 400;
 `;
 
 const styles = StyleSheet.create({

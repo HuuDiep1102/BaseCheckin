@@ -4,8 +4,8 @@ import {ActivityIndicator} from 'react-native';
 import {IC_BASE_ME} from '@/assets';
 import {useClient} from '@/store/login';
 import {
-  replaceWithCheckinScreen,
-  replaceWithLoginScreen,
+  replaceWithMainScreen,
+  replaceWithWelcomeScreen,
 } from '@/utils/navigation';
 import {RawClient} from '@/types';
 
@@ -27,9 +27,9 @@ export const PreloadScreen = memo(function PreloadScreen() {
   useEffect(() => {
     setTimeout(() => {
       if (!!client?.access_token) {
-        replaceWithCheckinScreen();
+        replaceWithMainScreen();
       } else {
-        replaceWithLoginScreen();
+        replaceWithWelcomeScreen();
       }
     }, 2000);
   }, []);

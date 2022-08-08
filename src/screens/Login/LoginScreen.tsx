@@ -2,22 +2,20 @@ import React, {memo, useCallback, useState} from 'react';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 import {IC_BASE_ME, IC_EMAIL, IC_LOCK, IMG_BANNER} from '@/assets';
-import {replaceWithCheckinScreen} from '@/utils/navigation';
+import {replaceWithMainScreen} from '@/utils/navigation';
 import {
   Alert,
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
   StyleSheet,
-  TouchableWithoutFeedback,
-  Keyboard,
   View,
   ScrollView,
   Dimensions,
 } from 'react-native';
 import {useAsyncFn} from 'react-use';
 import {requestLogin} from '@/store/login/functions';
-import CustomTextInput from '@/components/TextInput';
+import {CustomTextInput} from '@/components/TextInput';
 import {css} from 'styled-components';
 
 export const LoginScreen = memo(() => {
@@ -40,9 +38,9 @@ export const LoginScreen = memo(() => {
         [{text: 'OK'}],
       );
     } else {
-      replaceWithCheckinScreen();
+      replaceWithMainScreen();
     }
-  }, [replaceWithCheckinScreen, account]);
+  }, [replaceWithMainScreen, account]);
 
   const onChangeValue = useCallback((keyName: string, value: string) => {
     setAccount(prev => ({
@@ -87,9 +85,14 @@ export const LoginScreen = memo(() => {
             </LoginInputContainer>
             <FooterContainer>
               <WrapButton>
-                <BtnLogin onPress={onLogin}>
+                <BtnLogin disabled={loading} onPress={onLogin}>
                   <BtnLoginText>ĐĂNG NHẬP</BtnLoginText>
-                  {loading && <ActivityIndicator style={{marginLeft: 10}} />}
+                  {loading && (
+                    <ActivityIndicator
+                      color={'#ffffff'}
+                      style={{marginLeft: 10}}
+                    />
+                  )}
                 </BtnLogin>
               </WrapButton>
             </FooterContainer>

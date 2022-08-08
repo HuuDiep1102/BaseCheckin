@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React, {memo, useMemo} from 'react';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
 
@@ -7,10 +7,17 @@ interface Props {
 }
 
 export const HeaderCalendar = ({date}: Props) => {
-  const _date = new Date(date);
+  const _date = useMemo(() => {
+    return new Date(date);
+  }, [date]);
 
-  const month = _date.getMonth() + 1;
-  const year = _date.getFullYear();
+  const month = useMemo(() => {
+    return _date.getMonth() + 1;
+  }, [_date]);
+
+  const year = useMemo(() => {
+    return _date.getFullYear();
+  }, [_date]);
 
   return (
     <HeaderContainer>

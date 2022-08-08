@@ -1,13 +1,12 @@
-import React, {forwardRef, memo} from 'react';
+import React, {forwardRef, useEffect, useMemo} from 'react';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {Colors} from '@/themes/Colors';
 import styled from 'styled-components/native';
 import {StyleSheet} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
 
 const LoadingView = styled.View`
   width: 80%;
-  height: 300px;
+  height: 240px;
   align-self: center;
   background-color: ${Colors.yellowOrange};
   margin-bottom: 5px;
@@ -15,25 +14,19 @@ const LoadingView = styled.View`
 
 const CameraView = (props: any, ref: any) => {
   const devices = useCameraDevices();
+
+  // const device = useMemo(() => {
+  //   return devices.front;
+  // }, [devices]);
+
   const device = devices.front;
-  const isFocused = useIsFocused();
 
   if (!device) {
     return <LoadingView />;
   }
 
   return (
-    <>
-      {isFocused && (
-        <Camera
-          ref={ref}
-          device={device}
-          isActive
-          photo
-          style={styles.camera}
-        />
-      )}
-    </>
+    <Camera ref={ref} device={device} isActive photo style={styles.camera} />
   );
 };
 

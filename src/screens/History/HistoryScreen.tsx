@@ -2,7 +2,7 @@ import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import moment from 'moment';
 import {Colors} from '@/themes/Colors';
-import React, {memo, useCallback, useEffect, useState} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {DayComponent} from '@/screens/History/components/DayComponent';
 import {RawClient} from '@/types';
 import {useClient} from '@/store/login';
@@ -83,6 +83,7 @@ export const HistoryScreen = memo(() => {
     if (!client.access_token || !client.client_key) {
       return null;
     }
+
     const time_start = moment(selectedDate).startOf('month').valueOf() / 1000;
 
     const time_end = moment(selectedDate).endOf('month').valueOf() / 1000;
@@ -102,12 +103,9 @@ export const HistoryScreen = memo(() => {
     getHistory().then();
   }, [selectedDate]);
 
-  const renderHeader = useCallback(
-    (date?: any) => {
-      return <HeaderCalendar date={date} />;
-    },
-    [loading],
-  );
+  const renderHeader = useCallback((date?: any) => {
+    return <HeaderCalendar date={date} />;
+  }, []);
 
   const renderDayComponent = useCallback(
     (
@@ -119,16 +117,21 @@ export const HistoryScreen = memo(() => {
         return <View />;
       }
 
-      const dateString = date.date?.dateString;
+      const dateString = useMemo(() => {
+        return date.date?.dateString;
+      }, [date]);
 
-      // const dateString = selectedDate.dateString;
+      const isDayInMonth = useMemo(() => {
+        return selectedMonth === date?.date?.month;
+      }, [date, selectedMonth]);
 
-      const isDayInMonth = selectedMonth === date?.date?.month;
-
-      const isToday = dateString === moment().format('YYYY-MM-DD');
+      const isToday = useMemo(() => {
+        return dateString === moment().format('YYYY-MM-DD');
+      }, [dateString]);
 
       return (
         <DayComponent
+          key={dateString}
           isToday={isToday}
           date={dateString}
           isDayInMonth={isDayInMonth}

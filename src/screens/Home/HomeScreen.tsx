@@ -1,28 +1,39 @@
 import * as React from 'react';
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet, Dimensions, useWindowDimensions, View} from 'react-native';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import styled from 'styled-components/native';
 import {Colors} from '@/themes/Colors';
 
 import {HeaderComponent} from '@/components/HeaderComponent';
-import {CheckInScreen} from '@/screens/CheckIn/CheckInScreen';
+import {CheckPermissionScreen} from '@/screens/CheckIn/CheckPermissionScreen';
 
 import {HistoryScreen} from '@/screens/History/HistoryScreen';
 import {memo, useCallback, useState} from 'react';
 
-const initialLayout = {width: Dimensions.get('window').width};
-
-const renderScene = SceneMap({
-  first: CheckInScreen,
-  second: HistoryScreen,
-});
+const routes = [
+  {key: 'first', title: 'CheckIn'},
+  {key: 'second', title: 'Lịch sử'},
+];
 
 export const HomeScreen = memo(() => {
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    {key: 'first', title: 'CheckIn'},
-    {key: 'second', title: 'Lịch sử'},
-  ]);
+
+  const _setIndex = useCallback((index: number) => {
+    setIndex(index);
+  }, []);
+
+  const renderScene = ({route}: any) => {
+    switch (route?.key) {
+      case 'first':
+        return <CheckPermissionScreen index={index} />;
+      case 'second':
+        return <HistoryScreen />;
+      default:
+        return null;
+    }
+  };
+
+  const {width} = useWindowDimensions();
 
   const renderTabBar = useCallback((props: any) => {
     return (
@@ -43,18 +54,17 @@ export const HomeScreen = memo(() => {
       <TabView
         navigationState={{index, routes}}
         renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={initialLayout}
+        onIndexChange={_setIndex}
+        initialLayout={{width}}
         style={styles.container}
         renderTabBar={renderTabBar}
+        lazy
       />
     </Container>
   );
 });
 
-const LabelText = styled.Text<{
-  focused: boolean | undefined;
-}>`
+const LabelText = styled.Text<{focused?: boolean}>`
   color: ${p => (p.focused ? Colors.azure : Colors.oldSilver)};
   margin: 8px;
   font-size: 15px;

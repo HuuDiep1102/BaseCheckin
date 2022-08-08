@@ -11,17 +11,24 @@ import useBoolean from '@/hooks/useBoolean';
 import {RawHistory} from '@/types';
 
 interface Props extends TextInputProps {
+  key?: string;
   date?: string;
   isDayInMonth: boolean;
   isToday: boolean;
 }
 
 export const DayComponent = memo(({date, isDayInMonth, isToday}: Props) => {
-  const weekName = moment(date).locale('vi').format('dddd');
+  const weekName = useMemo(() => {
+    return moment(date).locale('vi').format('dddd');
+  }, [date]);
 
-  const today = moment(date).format('L');
+  const today = useMemo(() => {
+    return moment(date).format('L');
+  }, [date]);
 
-  const dateTitle = moment(date).format('DD/MM').toString();
+  const dateTitle = useMemo(() => {
+    return moment(date).format('DD/MM').toString();
+  }, [date]);
 
   const [modalVisible, showModalVisible, hideModalVisible] = useBoolean(false); //Khong can viet thanh ham nua
 
@@ -154,7 +161,7 @@ const InputContactContainer = styled.View`
   max-height: ${Dimensions.get('window').height * 0.5}px;
 `;
 
-const LogTime = styled.View`
+const LogTime = styled.TouchableOpacity`
   height: 64px;
   padding-top: 10px;
   border-bottom-width: 0.5px;
