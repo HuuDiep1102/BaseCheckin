@@ -9,8 +9,9 @@ interface SelectItemProps {
   icon: any;
   clientCheckIn?: MobileClient;
   onPress: () => void;
-  active: boolean | undefined;
+  active?: boolean;
 }
+
 export const SelectItem = memo((props: SelectItemProps) => {
   const {title, icon, clientCheckIn, onPress, active} = props;
 

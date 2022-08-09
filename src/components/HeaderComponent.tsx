@@ -4,7 +4,7 @@ import {Colors} from '@/themes/Colors';
 import 'react-native-gesture-handler';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {StatusBar} from 'react-native';
-import {IC_LOCATION, IC_MENU} from '@/assets';
+import {IC_MENU} from '@/assets';
 import {openDrawer} from '@/utils/navigation';
 
 interface HeaderComponentProps {

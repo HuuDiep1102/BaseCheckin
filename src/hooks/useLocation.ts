@@ -2,9 +2,8 @@ import {memo, useCallback, useEffect, useRef, useState} from 'react';
 import Geolocation from '@react-native-community/geolocation';
 
 export const useLocation = () => {
-  const [latitude, setLatitude] = useState<number | undefined>();
-  const [longitude, setLongitude] = useState<number | undefined>();
-
+  const [latitude, setLatitude] = useState<number>();
+  const [longitude, setLongitude] = useState<number>();
   const watchID = useRef<any>();
 
   const getOneTimeLocation = useCallback(() => {
@@ -22,11 +21,11 @@ export const useLocation = () => {
       },
       {
         enableHighAccuracy: false,
-        timeout: 30000,
+        timeout: 5000,
         maximumAge: 1000,
       },
     );
-  }, []);
+  }, [Geolocation]);
 
   const subscribeLocationLocation = useCallback(() => {
     watchID.current = Geolocation.watchPosition(

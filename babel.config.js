@@ -16,10 +16,10 @@ module.exports = {
           '.jsx',
           '.js',
           '.json',
-          '.png',
+          '.png'
         ],
         alias: {
-          '@': './src',
+          '@': './src'
         },
       },
     ],

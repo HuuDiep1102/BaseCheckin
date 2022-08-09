@@ -79,13 +79,7 @@ export const CheckInScreen = memo(
     }, [latitude, longitude]);
 
     const [{loading}, submitCheckin] = useAsyncFn(async () => {
-      console.log('áda');
       if (!cameraRef?.current || !latitude || !longitude || !selectedClient) {
-        console.log('anull');
-        console.log('cameraRef?.current ', cameraRef?.current);
-        console.log('latitude ', latitude);
-        console.log('longitude ', longitude);
-        console.log('cselectedClient ', selectedClient);
         return null;
       }
 
@@ -105,14 +99,6 @@ export const CheckInScreen = memo(
         ...defaultParams,
       };
 
-      console.log('params', params);
-
-      // try {
-      //   const res = await requestCheckin(params);
-      // } catch (error) {
-      //   console.log('eee ', error);
-      // }
-
       const res = await requestCheckin(params);
 
       Alert.alert(
@@ -122,7 +108,7 @@ export const CheckInScreen = memo(
           : 'CheckIn không thành công, hãy vui lòng thử lại',
         [{text: 'OK'}],
       );
-    });
+    }, [latitude, longitude]);
 
     const mobileClients: MobileClient[] = useMobileClients();
 

@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback} from 'react';
 
 import {IC_LOCK} from '@/assets';
 

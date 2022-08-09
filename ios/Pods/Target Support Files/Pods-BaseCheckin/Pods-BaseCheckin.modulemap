@@ -1,6 +1,0 @@
-module Pods_BaseCheckin {
-  umbrella header "Pods-BaseCheckin-umbrella.h"
-
-  export *
-  module * { export * }
-}
